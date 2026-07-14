@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PALMGUARD — Autonomous Smart Palm Assistant</title>
+<meta name="description" content="PALMGUARD: robot patroli otonom Mobile AI + IoT untuk perkebunan kelapa sawit. Proyek PKM-KC.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+
+/* ============================================================
+   TOKENS
+   ============================================================ */
+:root{
+  --primary:#5C8479;        /* deepened from brief's #659287 for AA contrast on light bg */
+  --primary-bright:#659287;
+  --secondary:#88BDA4;
+  --accent:#B1D3B9;
+  --bg:#E6F2DD;
+  --bg-soft:#F3F8EF;
+  --white:#FFFFFF;
+  --ink:#132018;             /* near-black, greenish tint */
+  --ink-soft:#3E4C44;
+  --line:rgba(19,32,24,0.12);
+  --dark:#0F1B15;
+  --dark-card:#16241D;
+  --dark-line:rgba(255,255,255,0.10);
+
+  --font-display:'Poppins', sans-serif;
+  --font-body:'Inter', sans-serif;
+  --font-mono:'JetBrains Mono', monospace;
+
+  --space-1:8px; --space-2:16px; --space-3:24px; --space-4:40px;
+  --space-5:64px; --space-6:96px; --space-7:140px;
+
+  --radius-s:10px; --radius-m:18px; --radius-l:28px;
+  --ease:cubic-bezier(.22,.61,.36,1);
+}
+
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0;
+  font-family:var(--font-body);
+  background:var(--bg);
+  color:var(--ink);
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+h1,h2,h3,h4{
+  font-family:var(--font-display);
+  color:var(--ink);
+  margin:0 0 var(--space-2) 0;
+  letter-spacing:-0.01em;
+}
+p{margin:0 0 var(--space-2) 0; color:var(--ink-soft);}
+a{color:inherit;}
+::selection{background:var(--primary); color:var(--white);}
+:focus-visible{outline:2px solid var(--primary); outline-offset:3px;}
+
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; scroll-behavior:auto !important;}
+}
+
+.wrap{
+  max-width:1180px;
+  margin:0 auto;
+  padding:0 var(--space-4);
+}
+@media (max-width:640px){ .wrap{padding:0 var(--space-2);} }
+
+.eyebrow{
+  display:inline-flex; align-items:center; gap:10px;
+  font-family:var(--font-mono);
+  font-size:12.5px;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  color:var(--primary);
+  margin-bottom:var(--space-2);
+}
+.eyebrow::before{
+  content:"";
+  width:22px; height:1px;
+  background:var(--primary);
+  display:inline-block;
+}
+
+section{
+  position:relative;
+  padding:var(--space-7) 0;
+}
+.section-dark{ background:var(--dark); color:var(--white); }
+.section-dark p{ color:rgba(255,255,255,0.68); }
+.section-dark h1,.section-dark h2,.section-dark h3,.section-dark h4{ color:var(--white); }
+.section-dark .eyebrow{ color:var(--accent); }
+.section-dark .eyebrow::before{ background:var(--accent); }
+
+.section-head{
+  max-width:640px;
+  margin-bottom:var(--space-5);
+}
+.section-head h2{
+  font-size:clamp(28px,4vw,42px);
+  font-weight:600;
+}
+.section-head.center{ margin-left:auto; margin-right:auto; text-align:center; }
+
+/* reveal-on-scroll */
+.reveal{
+  opacity:0;
+  transform:translateY(28px);
+  transition:opacity .9s var(--ease), transform .9s var(--ease);
+}
+.reveal.in-view{ opacity:1; transform:translateY(0); }
+.reveal-delay-1{ transition-delay:.08s; }
+.reveal-delay-2{ transition-delay:.16s; }
+.reveal-delay-3{ transition-delay:.24s; }
+
+/* ============================================================
+   PATROL SPINE — signature element
+   A vertical line tracking scroll = the robot's patrol route.
+   The dot is the robot; filled portion is "distance covered".
+   Waypoint dots mark each section like GPS checkpoints.
+   ============================================================ */
+#patrol-spine{
+  position:fixed;
+  left:28px; top:0; bottom:0;
+  width:2px;
+  z-index:40;
+  display:none;
+}
+@media (min-width:980px){ #patrol-spine{ display:block; } }
+#patrol-spine .track{
+  position:absolute; inset:0;
+  background:var(--line);
+}
+#patrol-spine .fill{
+  position:absolute; left:0; top:0; width:100%;
+  height:0%;
+  background:linear-gradient(var(--primary), var(--secondary));
+  transition:height .05s linear;
+}
+#patrol-spine .rover{
+  position:absolute; left:50%; top:0%;
+  width:14px; height:14px;
+  transform:translate(-50%,-50%);
+  background:var(--white);
+  border:3px solid var(--primary);
+  border-radius:50%;
+  box-shadow:0 0 0 4px rgba(101,146,135,0.18);
+  transition:top .05s linear;
+}
+
+/* ============================================================
+   HERO
+   ============================================================ */
+.hero{
+  min-height:100svh;
+  display:flex; flex-direction:column; justify-content:center;
+  background:
+    radial-gradient(1100px 620px at 82% -10%, rgba(136,189,164,0.55), transparent 60%),
+    radial-gradient(900px 500px at 8% 110%, rgba(177,211,185,0.55), transparent 60%),
+    var(--bg-soft);
+  position:relative;
+  overflow:hidden;
+  padding:var(--space-6) 0;
+}
+.hero-inner{ position:relative; z-index:2; }
+.hero h1{
+  font-size:clamp(56px,10vw,132px);
+  font-weight:700;
+  line-height:0.95;
+  letter-spacing:-0.03em;
+  margin-bottom:var(--space-3);
+}
+.hero .lede{
+  max-width:560px;
+  font-size:19px;
+  color:var(--ink-soft);
+}
+.hero-tagchip{
+  display:inline-block;
+  font-family:var(--font-mono);
+  font-size:12px;
+  padding:6px 14px;
+  border:1px solid var(--line);
+  border-radius:999px;
+  color:var(--primary);
+  margin-bottom:var(--space-3);
+}
+.scroll-cue{
+  position:absolute; bottom:36px; left:50%; transform:translateX(-50%);
+  display:flex; flex-direction:column; align-items:center; gap:8px;
+  font-family:var(--font-mono); font-size:11px; letter-spacing:0.1em; text-transform:uppercase;
+  color:var(--primary); opacity:.85;
+}
+.scroll-cue .line{
+  width:1px; height:38px;
+  background:linear-gradient(var(--primary), transparent);
+  animation:scrollpulse 1.8s ease-in-out infinite;
+}
+@keyframes scrollpulse{
+  0%,100%{ transform:scaleY(0.4); transform-origin:top; opacity:.4; }
+  50%{ transform:scaleY(1); transform-origin:top; opacity:1; }
+}
+
+/* floating orbit path behind hero — echoes patrol route */
+.hero-route{
+  position:absolute; inset:0; z-index:1;
+  opacity:0.9;
+}
+.hero-route svg{ width:100%; height:100%; }
+.hero-route .dot{
+  animation:travel 9s linear infinite;
+}
+@keyframes travel{
+  0%{ offset-distance:0%; }
+  100%{ offset-distance:100%; }
+}
+
+/* ============================================================
+   BIG STAT (context section)
+   ============================================================ */
+.stat-block{ text-align:center; }
+.stat-number{
+  font-family:var(--font-display);
+  font-weight:700;
+  font-size:clamp(64px,14vw,160px);
+  line-height:1;
+  background:linear-gradient(135deg, var(--primary), var(--secondary));
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.stat-label{
+  font-size:16px; color:var(--ink-soft); max-width:440px; margin:var(--space-2) auto 0;
+}
+
+/* ============================================================
+   CARD GRID (problems / solutions)
+   ============================================================ */
+.grid{ display:grid; gap:var(--space-3); }
+.grid-4{ grid-template-columns:repeat(4,1fr); }
+.grid-3{ grid-template-columns:repeat(3,1fr); }
+.grid-2{ grid-template-columns:repeat(2,1fr); }
+@media (max-width:900px){ .grid-4{ grid-template-columns:repeat(2,1fr); } .grid-3{ grid-template-columns:1fr; } }
+@media (max-width:640px){ .grid-4,.grid-2{ grid-template-columns:1fr; } }
+
+.card{
+  background:var(--white);
+  border:1px solid var(--line);
+  border-radius:var(--radius-m);
+  padding:var(--space-3);
+  transition:transform .35s var(--ease), box-shadow .35s var(--ease), border-color .35s var(--ease);
+}
+.card:hover{
+  transform:translateY(-6px);
+  box-shadow:0 22px 44px -20px rgba(19,32,24,0.25);
+  border-color:var(--secondary);
+}
+.card .num{
+  font-family:var(--font-mono);
+  font-size:12px; color:var(--secondary);
+  margin-bottom:var(--space-2);
+  letter-spacing:.05em;
+}
+.card h3{ font-size:19px; font-weight:600; }
+.card p{ font-size:14.5px; margin-bottom:0; }
+
+.card-dark{
+  background:var(--dark-card);
+  border:1px solid var(--dark-line);
+}
+.card-dark:hover{ border-color:var(--secondary); }
+.card-dark h3{ color:var(--white); }
+.card-dark p{ color:rgba(255,255,255,0.62); }
+
+/* ============================================================
+   RESEARCH GAP — comparison
+   ============================================================ */
+.gap-table{
+  border:1px solid var(--line);
+  border-radius:var(--radius-m);
+  overflow:hidden;
+  background:var(--white);
+}
+.gap-row{
+  display:grid;
+  grid-template-columns:1.1fr 1fr 1fr;
+  border-bottom:1px solid var(--line);
+}
+.gap-row:last-child{ border-bottom:none; }
+.gap-row.head{ background:var(--dark); color:var(--white); font-family:var(--font-mono); font-size:12.5px; text-transform:uppercase; letter-spacing:.06em; }
+.gap-row > div{ padding:18px 22px; font-size:14.5px; border-right:1px solid var(--line); }
+.gap-row.head > div{ border-right:1px solid var(--dark-line); }
+.gap-row > div:last-child{ border-right:none; }
+.gap-row:not(.head) .col-a{ color:var(--ink-soft); }
+.gap-row:not(.head) .col-b{ color:var(--ink-soft); }
+.gap-row:not(.head) .col-c{ color:var(--primary); font-weight:600; }
+@media (max-width:760px){
+  .gap-row{ grid-template-columns:1fr; }
+  .gap-row > div{ border-right:none; border-bottom:1px solid var(--line); }
+  .gap-row > div:last-child{ border-bottom:none; }
+}
+.gap-statement{
+  margin-top:var(--space-4);
+  padding:var(--space-4);
+  border-left:3px solid var(--primary);
+  background:var(--bg-soft);
+  border-radius:0 var(--radius-m) var(--radius-m) 0;
+  font-family:var(--font-display);
+  font-size:clamp(18px,2.4vw,24px);
+  font-weight:500;
+  color:var(--ink);
+}
+
+/* ============================================================
+   THESIS (mengapa PALMGUARD)
+   ============================================================ */
+.thesis{
+  font-family:var(--font-display);
+  font-size:clamp(26px,4.4vw,46px);
+  font-weight:600;
+  line-height:1.25;
+  max-width:900px;
+}
+.thesis .accent{ color:var(--secondary); }
+
+/* ============================================================
+   ROBOT EXPLODED VIEW
+   ============================================================ */
+.exploded{
+  display:grid;
+  grid-template-columns:1fr 1.1fr;
+  gap:var(--space-5);
+  align-items:center;
+}
+@media (max-width:900px){ .exploded{ grid-template-columns:1fr; } }
+.exploded-visual{ position:relative; }
+.exploded-visual svg{ width:100%; height:auto; }
+.hw-list{ display:flex; flex-direction:column; gap:14px; }
+.hw-item{
+  display:flex; align-items:baseline; gap:16px;
+  padding:14px 0;
+  border-bottom:1px solid var(--dark-line);
+  opacity:0.35;
+  transition:opacity .5s var(--ease), transform .5s var(--ease);
+  transform:translateX(-6px);
+}
+.hw-item.active{ opacity:1; transform:translateX(0); }
+.hw-item .tag{
+  font-family:var(--font-mono); font-size:12px; color:var(--secondary); width:34px; flex-shrink:0;
+}
+.hw-item h4{ margin:0 0 2px; font-size:16px; color:var(--white); font-weight:600; }
+.hw-item p{ margin:0; font-size:13.5px; color:rgba(255,255,255,0.55); }
+
+/* ============================================================
+   MODULE TABS
+   ============================================================ */
+.module-tabs{
+  display:flex; gap:10px; flex-wrap:wrap;
+  margin-bottom:var(--space-4);
+  border-bottom:1px solid var(--line);
+}
+.module-tab{
+  font-family:var(--font-mono); font-size:13px; letter-spacing:.03em;
+  padding:12px 4px; margin-right:22px;
+  background:none; border:none; cursor:pointer;
+  color:var(--ink-soft);
+  position:relative; top:1px;
+  border-bottom:2px solid transparent;
+  transition:color .25s var(--ease), border-color .25s var(--ease);
+}
+.module-tab.active{ color:var(--primary); border-color:var(--primary); }
+.module-panel{ display:none; }
+.module-panel.active{ display:grid; grid-template-columns:1fr 1fr; gap:var(--space-5); align-items:center; }
+@media (max-width:840px){ .module-panel.active{ grid-template-columns:1fr; } }
+.module-flow{
+  font-family:var(--font-mono); font-size:13.5px;
+  background:var(--white);
+  border:1px solid var(--line);
+  border-radius:var(--radius-m);
+  padding:var(--space-3);
+}
+.module-flow .step{
+  display:flex; align-items:center; gap:12px;
+  padding:10px 0;
+}
+.module-flow .step:not(:last-child){ border-bottom:1px dashed var(--line); }
+.module-flow .step .dot{
+  width:8px; height:8px; border-radius:50%; background:var(--secondary); flex-shrink:0;
+}
+.module-copy h3{ font-size:24px; }
+.module-copy .badge{
+  display:inline-block; font-family:var(--font-mono); font-size:11.5px;
+  padding:4px 10px; border-radius:999px; background:var(--accent); color:var(--ink);
+  margin-bottom:var(--space-2);
+}
+
+/* ============================================================
+   DIAGRAMS (AI pipeline / IoT / workflow)
+   ============================================================ */
+.diagram-card{
+  background:var(--dark-card);
+  border:1px solid var(--dark-line);
+  border-radius:var(--radius-l);
+  padding:var(--space-5) var(--space-4);
+}
+.diagram-card svg text{ font-family:var(--font-mono); }
+.diagram-card svg .lbl{ fill:rgba(255,255,255,0.85); font-size:13px; }
+.diagram-card svg .sub{ fill:rgba(255,255,255,0.45); font-size:11px; }
+.flow-node{
+  fill:var(--dark);
+  stroke:var(--dark-line);
+  stroke-width:1;
+}
+.flow-line{
+  stroke:var(--secondary);
+  stroke-width:1.5;
+  fill:none;
+  stroke-dasharray:6 6;
+  animation:dash 2.4s linear infinite;
+}
+@keyframes dash{ to{ stroke-dashoffset:-120; } }
+.pulse-dot{ fill:var(--secondary); animation:pulseFade 2s ease-in-out infinite; }
+@keyframes pulseFade{ 0%,100%{ opacity:1; } 50%{ opacity:.25; } }
+
+/* ============================================================
+   DASHBOARD MOCKUP
+   ============================================================ */
+.dash-frame{
+  background:var(--white);
+  border:1px solid var(--line);
+  border-radius:var(--radius-l);
+  overflow:hidden;
+  box-shadow:0 40px 90px -40px rgba(19,32,24,0.35);
+}
+.dash-topbar{
+  display:flex; align-items:center; gap:8px;
+  padding:14px 18px; border-bottom:1px solid var(--line);
+  font-family:var(--font-mono); font-size:12px; color:var(--ink-soft);
+}
+.dash-topbar .lights{ display:flex; gap:6px; }
+.dash-topbar .lights span{ width:9px; height:9px; border-radius:50%; background:var(--accent); }
+.dash-body{
+  display:grid;
+  grid-template-columns:220px 1fr;
+}
+@media (max-width:760px){ .dash-body{ grid-template-columns:1fr; } }
+.dash-nav{
+  padding:var(--space-3);
+  border-right:1px solid var(--line);
+  background:var(--bg-soft);
+  display:flex; flex-direction:column; gap:6px;
+}
+.dash-nav .item{
+  font-size:13px; padding:9px 12px; border-radius:8px; color:var(--ink-soft);
+}
+.dash-nav .item.active{ background:var(--white); color:var(--primary); font-weight:600; box-shadow:0 1px 4px rgba(19,32,24,.08); }
+.dash-main{ padding:var(--space-3); display:grid; gap:var(--space-2); grid-template-columns:1fr 1fr; }
+.dash-tile{
+  border:1px solid var(--line); border-radius:var(--radius-s); padding:16px;
+  grid-column:span 1;
+}
+.dash-tile.wide{ grid-column:span 2; }
+.dash-tile .k{ font-family:var(--font-mono); font-size:11px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.06em; }
+.dash-tile .v{ font-family:var(--font-display); font-size:26px; font-weight:600; margin-top:4px; }
+.heat-grid{ display:grid; grid-template-columns:repeat(12,1fr); gap:3px; margin-top:10px; }
+.heat-grid span{ aspect-ratio:1; border-radius:2px; }
+
+/* ============================================================
+   ROADMAP
+   ============================================================ */
+.roadmap{
+  display:flex; flex-direction:column; gap:0;
+  border-left:2px solid var(--line);
+  margin-left:8px;
+}
+.rm-step{
+  position:relative;
+  padding:22px 0 22px 36px;
+}
+.rm-step::before{
+  content:attr(data-n);
+  position:absolute; left:-11px; top:22px;
+  width:20px; height:20px;
+  background:var(--white);
+  border:2px solid var(--primary);
+  border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-family:var(--font-mono); font-size:9.5px; color:var(--primary); font-weight:600;
+}
+.rm-step h4{ font-size:16.5px; margin-bottom:2px; }
+.rm-step p{ font-size:14px; margin:0; }
+
+/* ============================================================
+   IMPACT
+   ============================================================ */
+.impact-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:var(--space-4); text-align:center; }
+@media (max-width:760px){ .impact-grid{ grid-template-columns:1fr; } }
+.impact-num{
+  font-family:var(--font-display); font-weight:700;
+  font-size:clamp(40px,6vw,64px);
+  color:var(--white);
+}
+.impact-cap{ font-size:14px; color:rgba(255,255,255,0.6); max-width:220px; margin:6px auto 0; }
+
+/* ============================================================
+   CLOSING
+   ============================================================ */
+.closing{
+  text-align:center;
+}
+.closing h2{
+  font-size:clamp(32px,6vw,64px);
+  max-width:820px; margin:0 auto var(--space-3);
+}
+.closing p{ max-width:520px; margin:0 auto var(--space-4); }
+.closing-btn{
+  display:inline-flex; align-items:center; gap:10px;
+  font-family:var(--font-mono); font-size:13px;
+  padding:14px 26px;
+  background:var(--primary);
+  color:var(--white);
+  border-radius:999px;
+  text-decoration:none;
+  transition:transform .3s var(--ease), background .3s var(--ease);
+}
+.closing-btn:hover{ transform:translateY(-3px); background:var(--secondary); }
+
+footer{
+  padding:var(--space-4) 0;
+  text-align:center;
+  font-family:var(--font-mono);
+  font-size:12px;
+  color:rgba(255,255,255,0.4);
+}
+</style>
+</head>
+<body>
+
+<div id="patrol-spine" aria-hidden="true">
+  <div class="track"></div>
+  <div class="fill" id="spine-fill"></div>
+  <div class="rover" id="spine-rover"></div>
+</div>
+
+<!-- ============================================================
+     1. HERO
+     ============================================================ -->
+<header class="hero">
+  <div class="hero-route" aria-hidden="true">
+    <svg viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice">
+      <path id="hero-path" d="M -100 650 C 250 550, 350 750, 650 620 S 1050 400, 1300 480"
+            fill="none" style="stroke:#88BDA4" stroke-width="1.5" stroke-dasharray="2 10" opacity="0.55"/>
+      <circle class="dot" r="5" style="fill:#659287; offset-path:path('M -100 650 C 250 550, 350 750, 650 620 S 1050 400, 1300 480');"/>
+    </svg>
+  </div>
+  <div class="wrap hero-inner">
+    <div class="hero-tagchip">PKM-KC · Karsa Cipta</div>
+    <h1>PALM<br>GUARD</h1>
+    <p class="lede">Robot patroli otonom yang membawa AI dan sensor langsung ke setiap pohon sawit — bukan sensor pasif yang menunggu di satu titik, tapi platform yang bergerak, mengamati, dan bertindak.</p>
+  </div>
+  <div class="scroll-cue"><span>Cara kerja</span><span class="line"></span></div>
+</header>
+
+<!-- ============================================================
+     2. KONTEKS
+     ============================================================ -->
+<section id="context">
+  <div class="wrap">
+    <div class="stat-block reveal">
+      <div class="eyebrow" style="justify-content:center">Skala Persoalan</div>
+      <div class="stat-number">#1</div>
+      <p class="stat-label">Indonesia adalah produsen minyak sawit terbesar di dunia — industri yang menopang jutaan petani, sekaligus industri yang inspeksi kebunnya sebagian besar masih dilakukan dengan mata dan langkah kaki manusia.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     3. MASALAH
+     ============================================================ -->
+<section id="problems">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="eyebrow">Masalah di Lapangan</div>
+      <h2>Empat kebocoran yang selama ini dianggap "biasa"</h2>
+      <p>Masing-masing kecil kalau dilihat per pohon. Dikalikan ribuan hektare, jadi kerugian yang nyata.</p>
+    </div>
+    <div class="grid grid-4">
+      <div class="card reveal">
+        <div class="num">01</div>
+        <h3>Ganoderma terlambat terdeteksi</h3>
+        <p>Gejala busuk pangkal batang baru terlihat kasat mata saat penyakit sudah parah — di titik itu, pohon biasanya sudah sulit diselamatkan.</p>
+      </div>
+      <div class="card reveal reveal-delay-1">
+        <div class="num">02</div>
+        <h3>Brondolan hilang di tanah</h3>
+        <p>Buah lepas yang jatuh dan tidak terpungut adalah rendemen minyak yang hilang begitu saja, tersebar di area yang luas.</p>
+      </div>
+      <div class="card reveal reveal-delay-2">
+        <div class="num">03</div>
+        <h3>Gulma menyerap hara</h3>
+        <p>Gulma di sekitar piringan pohon bersaing memperebutkan air dan nutrisi, memperlambat pertumbuhan tanpa disadari.</p>
+      </div>
+      <div class="card reveal reveal-delay-3">
+        <div class="num">04</div>
+        <h3>Inspeksi manual mahal & lambat</h3>
+        <p>Mengecek ribuan pohon dengan tenaga manusia menghabiskan waktu, biaya tenaga kerja, dan hasilnya tidak konsisten.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     4. SOLUSI YANG ADA
+     ============================================================ -->
+<section id="existing" style="background:var(--bg-soft)">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="eyebrow">Yang Sudah Dicoba</div>
+      <h2>Tiga pendekatan yang ada — dan batasnya masing-masing</h2>
+    </div>
+    <div class="grid grid-3">
+      <div class="card reveal">
+        <h3>Sensor tetap per pohon</h3>
+        <p>Akurat untuk titik yang dipasangi, tapi biaya instalasi melonjak begitu diperluas ke ribuan pohon — dan tidak bisa "melihat" area di antaranya.</p>
+      </div>
+      <div class="card reveal reveal-delay-1">
+        <h3>Inspeksi manual berkala</h3>
+        <p>Fleksibel, tapi bergantung penuh pada kejelian dan stamina orang — sulit dijadwalkan rutin di kebun yang luas.</p>
+      </div>
+      <div class="card reveal reveal-delay-2">
+        <h3>Survei drone udara</h3>
+        <p>Baik untuk pemetaan luas dari atas, tapi tidak bisa mengambil data dari dekat batang atau tanah, dan tidak bisa langsung bertindak (menyemprot, dsb).</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     5. RESEARCH GAP
+     ============================================================ -->
+<section id="gap">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="eyebrow">Research Gap</div>
+      <h2>Belum ada yang menyatukan ketiganya jadi satu sistem yang bergerak</h2>
+    </div>
+    <div class="gap-table reveal">
+      <div class="gap-row head">
+        <div>Kebutuhan</div><div>Pendekatan Existing</div><div>Yang Belum Terjawab</div>
+      </div>
+      <div class="gap-row">
+        <div class="col-a">Cakupan tiap pohon, bukan sampel</div><div class="col-b">Sensor tetap (mahal bila menyeluruh) / manual (tidak konsisten)</div><div class="col-c">Cakupan penuh dengan biaya rendah</div>
+      </div>
+      <div class="gap-row">
+        <div class="col-a">Data dari dekat batang & tanah</div><div class="col-b">Drone hanya melihat dari atas</div><div class="col-c">Inspeksi jarak dekat yang mobile</div>
+      </div>
+      <div class="gap-row">
+        <div class="col-a">Tindakan langsung di lokasi</div><div class="col-b">Ketiganya hanya mendeteksi, tidak bertindak</div><div class="col-c">Deteksi sekaligus aksi (spot spraying)</div>
+      </div>
+    </div>
+    <div class="gap-statement reveal">
+      Solusi yang ada saat ini belum menjawab kebutuhan sistem yang mobile, berbiaya rendah, dan mampu langsung bertindak dalam satu platform terintegrasi — bukan tiga alat terpisah untuk tiga masalah terpisah.
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     6. MENGAPA PALMGUARD
+     ============================================================ -->
+<section id="why" style="background:var(--bg-soft)">
+  <div class="wrap">
+    <div class="eyebrow reveal">Mengapa PALMGUARD</div>
+    <p class="thesis reveal">Daripada memasang satu sensor di setiap pohon, <span class="accent">bawa satu sensor berjalan ke setiap pohon.</span> Itu ide dasarnya — satu robot patroli, membawa seluruh kemampuan deteksi sekaligus kemampuan bertindak.</p>
+  </div>
+</section>
+
+<!-- ============================================================
+     7. ROBOT — EXPLODED VIEW
+     ============================================================ -->
+<section id="robot" class="section-dark">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="eyebrow">Robot PALMGUARD</div>
+      <h2>Satu unit, delapan sistem yang bekerja bersamaan</h2>
+    </div>
+    <div class="exploded">
+      <div class="exploded-visual reveal">
+        <svg viewBox="0 0 480 420" fill="none">
+          <ellipse cx="240" cy="380" rx="150" ry="14" fill="black" opacity="0.25"/>
+          <rect x="120" y="180" width="240" height="120" rx="18" fill="#1C2C23" stroke="#88BDA4" stroke-width="1.5"/>
+          <rect x="150" y="130" width="80" height="60" rx="10" fill="#233327" stroke="#88BDA4" stroke-width="1.2"/>
+          <circle cx="190" cy="160" r="10" fill="#B1D3B9"/>
+          <rect x="60" y="230" width="50" height="50" rx="8" fill="#233327" stroke="#659287"/>
+          <rect x="370" y="230" width="50" height="50" rx="8" fill="#233327" stroke="#659287"/>
+          <circle cx="150" cy="330" r="26" fill="#0F1B15" stroke="#88BDA4" stroke-width="2"/>
+          <circle cx="330" cy="330" r="26" fill="#0F1B15" stroke="#88BDA4" stroke-width="2"/>
+          <rect x="250" y="195" width="70" height="35" rx="6" fill="#0F1B15" stroke="#B1D3B9"/>
+          <line x1="240" y1="240" x2="240" y2="130" stroke="#3E4C44" stroke-dasharray="3 4"/>
+          <line x1="85" y1="255" x2="120" y2="240" stroke="#3E4C44" stroke-dasharray="3 4"/>
+          <line x1="395" y1="255" x2="360" y2="240" stroke="#3E4C44" stroke-dasharray="3 4"/>
+        </svg>
+      </div>
+      <div class="hw-list" id="hw-list">
+        <div class="hw-item"><span class="tag">01</span><div><h4>Jetson Orin Nano</h4><p>Otak AI — menjalankan inferensi computer vision & klasifikasi secara lokal (edge AI).</p></div></div>
+        <div class="hw-item"><span class="tag">02</span><div><h4>ESP32 Controller</h4><p>Membaca seluruh sensor dan menjembatani komunikasi antar modul.</p></div></div>
+        <div class="hw-item"><span class="tag">03</span><div><h4>GPS + IMU</h4><p>Navigasi posisi dan orientasi robot selama patroli.</p></div></div>
+        <div class="hw-item"><span class="tag">04</span><div><h4>LiDAR / Ultrasonic</h4><p>Deteksi dan hindari rintangan di jalur kebun.</p></div></div>
+        <div class="hw-item"><span class="tag">05</span><div><h4>Kamera RGB</h4><p>Mata robot untuk deteksi brondolan dan gulma.</p></div></div>
+        <div class="hw-item"><span class="tag">06</span><div><h4>Sensor pH · Kelembapan · Suhu</h4><p>Membaca kondisi tanah di sekitar pohon.</p></div></div>
+        <div class="hw-item"><span class="tag">07</span><div><h4>Sensor Impedansi Batang</h4><p>Indikator awal risiko Ganoderma pada jaringan batang.</p></div></div>
+        <div class="hw-item"><span class="tag">08</span><div><h4>Pompa + Tangki + Nozzle</h4><p>Eksekutor precision spot spraying pada gulma yang terdeteksi.</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     8. MODUL UTAMA
+     ============================================================ -->
+<section id="modules">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="eyebrow">Modul Utama</div>
+      <h2>Empat kemampuan inti, satu robot</h2>
+    </div>
+    <div class="module-tabs" role="tablist">
+      <button class="module-tab active" data-tab="ganoderma">Ganoderma</button>
+      <button class="module-tab" data-tab="brondolan">Brondolan</button>
+      <button class="module-tab" data-tab="gulma">Gulma</button>
+      <button class="module-tab" data-tab="spraying">Spot Spraying</button>
+    </div>
+
+    <div class="module-panel active" data-panel="ganoderma">
+      <div class="module-copy">
+        <span class="badge">Early Detection</span>
+        <h3>Ganoderma Detection</h3>
+        <p>Sensor impedansi batang dikombinasikan dengan kelembapan, pH, dan suhu tanah. Model AI mengklasifikasikan kondisi pohon sebelum gejala terlihat mata.</p>
+      </div>
+      <div class="module-flow">
+        <div class="step"><span class="dot"></span>Robot berhenti di titik pohon</div>
+        <div class="step"><span class="dot"></span>Sensor membaca impedansi & kondisi tanah</div>
+        <div class="step"><span class="dot"></span>AI mengklasifikasi risiko</div>
+        <div class="step"><span class="dot"></span>Output: <b>Healthy · Warning · Critical</b></div>
+      </div>
+    </div>
+
+    <div class="module-panel" data-panel="brondolan">
+      <div class="module-copy">
+        <span class="badge">Computer Vision</span>
+        <h3>Loose Fruit Detection</h3>
+        <p>Kamera RGB dan model deteksi objek mengenali brondolan yang jatuh, lalu menandai lokasinya secara presisi agar mudah dipungut petani.</p>
+      </div>
+      <div class="module-flow">
+        <div class="step"><span class="dot"></span>Kamera menangkap area sekitar piringan</div>
+        <div class="step"><span class="dot"></span>Model deteksi objek mengenali brondolan</div>
+        <div class="step"><span class="dot"></span>Koordinat GPS disimpan</div>
+        <div class="step"><span class="dot"></span>Muncul sebagai heatmap di dashboard</div>
+      </div>
+    </div>
+
+    <div class="module-panel" data-panel="gulma">
+      <div class="module-copy">
+        <span class="badge">Mapping</span>
+        <h3>Weed Detection</h3>
+        <p>Computer vision mengenali gulma di sekitar pohon dan memetakan area yang membutuhkan tindakan — bukan seluruh piringan disemprot rata.</p>
+      </div>
+      <div class="module-flow">
+        <div class="step"><span class="dot"></span>Kamera mendeteksi tekstur & pola gulma</div>
+        <div class="step"><span class="dot"></span>Posisi relatif terhadap pohon dihitung</div>
+        <div class="step"><span class="dot"></span>Area gulma dipetakan</div>
+        <div class="step"><span class="dot"></span>Data diteruskan ke modul spraying</div>
+      </div>
+    </div>
+
+    <div class="module-panel" data-panel="spraying">
+      <div class="module-copy">
+        <span class="badge">Action</span>
+        <h3>Precision Weed Spraying</h3>
+        <p>Berbeda dari penyemprotan rata, nozzle robot hanya aktif tepat di atas titik gulma — herbisida yang dipakai jauh lebih sedikit.</p>
+      </div>
+      <div class="module-flow">
+        <div class="step"><span class="dot"></span>Terima koordinat gulma dari modul deteksi</div>
+        <div class="step"><span class="dot"></span>Robot memposisikan nozzle</div>
+        <div class="step"><span class="dot"></span>Semprot presisi pada titik gulma saja</div>
+        <div class="step"><span class="dot"></span>Riwayat penyemprotan tersimpan</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     9. AI PIPELINE
+     ============================================================ -->
+<section id="ai-pipeline" class="section-dark">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="eyebrow">AI Pipeline</div>
+      <h2>Dari data mentah ke keputusan, di dalam robot itu sendiri</h2>
+      <p>Seluruh inferensi berjalan secara lokal (edge AI) di Jetson Orin Nano — tidak menunggu koneksi cloud untuk mengambil keputusan cepat.</p>
+    </div>
+    <div class="diagram-card reveal">
+      <svg viewBox="0 0 900 200" width="100%">
+        <g>
+          <rect class="flow-node" x="10" y="70" width="140" height="60" rx="10"/>
+          <text class="lbl" x="80" y="95" text-anchor="middle">Sensor + Kamera</text>
+          <text class="sub" x="80" y="112" text-anchor="middle">raw input</text>
+
+          <path class="flow-line" d="M150 100 H230"/>
+          <circle class="pulse-dot" cx="190" cy="100" r="3"/>
+
+          <rect class="flow-node" x="230" y="70" width="140" height="60" rx="10"/>
+          <text class="lbl" x="300" y="95" text-anchor="middle">Preprocessing</text>
+          <text class="sub" x="300" y="112" text-anchor="middle">normalize, crop</text>
+
+          <path class="flow-line" d="M370 100 H450"/>
+          <circle class="pulse-dot" cx="410" cy="100" r="3"/>
+
+          <rect class="flow-node" x="450" y="70" width="140" height="60" rx="10"/>
+          <text class="lbl" x="520" y="95" text-anchor="middle">Edge Inference</text>
+          <text class="sub" x="520" y="112" text-anchor="middle">Jetson Orin Nano</text>
+
+          <path class="flow-line" d="M590 100 H670"/>
+          <circle class="pulse-dot" cx="630" cy="100" r="3"/>
+
+          <rect class="flow-node" x="670" y="70" width="140" height="60" rx="10"/>
+          <text class="lbl" x="740" y="95" text-anchor="middle">Keputusan</text>
+          <text class="sub" x="740" y="112" text-anchor="middle">alert / spray / log</text>
+
+          <path class="flow-line" d="M810 100 H860 V30 H830" opacity="0.5"/>
+        </g>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     10. IOT ARCHITECTURE
+     ============================================================ -->
+<section id="iot" class="section-dark" style="padding-top:0">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="eyebrow">Arsitektur IoT</div>
+      <h2>Bagaimana data robot sampai ke layar petani</h2>
+    </div>
+    <div class="diagram-card reveal">
+      <svg viewBox="0 0 900 260" width="100%">
+        <rect class="flow-node" x="10" y="100" width="120" height="60" rx="10"/>
+        <text class="lbl" x="70" y="125" text-anchor="middle">Sensor</text>
+        <text class="sub" x="70" y="142" text-anchor="middle">ESP32</text>
+
+        <path class="flow-line" d="M130 130 H210"/>
+        <rect class="flow-node" x="210" y="100" width="120" height="60" rx="10"/>
+        <text class="lbl" x="270" y="125" text-anchor="middle">Jetson AI</text>
+        <text class="sub" x="270" y="142" text-anchor="middle">edge compute</text>
+
+        <path class="flow-line" d="M330 130 H410"/>
+        <rect class="flow-node" x="410" y="100" width="130" height="60" rx="10"/>
+        <text class="lbl" x="475" y="120" text-anchor="middle">WiFi / LoRa</text>
+        <text class="sub" x="475" y="137" text-anchor="middle">/ 4G uplink</text>
+
+        <path class="flow-line" d="M540 130 H620"/>
+        <rect class="flow-node" x="620" y="100" width="130" height="60" rx="10"/>
+        <text class="lbl" x="685" y="125" text-anchor="middle">Cloud DB</text>
+        <text class="sub" x="685" y="142" text-anchor="middle">+ REST API</text>
+
+        <path class="flow-line" d="M750 130 H830"/>
+        <rect class="flow-node" x="830" y="100" width="60" height="60" rx="10"/>
+        <text class="lbl" x="860" y="125" text-anchor="middle" style="font-size:11px">Dash-</text>
+        <text class="lbl" x="860" y="140" text-anchor="middle" style="font-size:11px">board</text>
+
+        <circle class="pulse-dot" cx="170" cy="130" r="3"/>
+        <circle class="pulse-dot" cx="370" cy="130" r="3"/>
+        <circle class="pulse-dot" cx="580" cy="130" r="3"/>
+        <circle class="pulse-dot" cx="790" cy="130" r="3"/>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     11. WORKFLOW LOOP
+     ============================================================ -->
+<section id="workflow">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="eyebrow">Alur Kerja Robot</div>
+      <h2>Satu siklus patroli, sepenuhnya otonom</h2>
+    </div>
+    <div class="diagram-card reveal" style="background:var(--white); border-color:var(--line)">
+      <svg viewBox="0 0 700 700" width="100%" style="max-width:560px;display:block;margin:0 auto">
+        <circle cx="350" cy="350" r="240" fill="none" stroke="var(--line)" stroke-width="1.5" stroke-dasharray="4 6"/>
+        <g id="loop-nodes"></g>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     12. DASHBOARD
+     ============================================================ -->
+<section id="dashboard" style="background:var(--bg-soft)">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="eyebrow">Dashboard Petani</div>
+      <h2>Semua yang robot lihat, dalam satu layar</h2>
+    </div>
+    <div class="dash-frame reveal">
+      <div class="dash-topbar">
+        <div class="lights"><span></span><span></span><span></span></div>
+        <span>palmguard.dashboard — kebun blok C</span>
+      </div>
+      <div class="dash-body">
+        <div class="dash-nav">
+          <div class="item active">Ringkasan</div>
+          <div class="item">Peta Robot</div>
+          <div class="item">Heatmap Ganoderma</div>
+          <div class="item">Heatmap Brondolan</div>
+          <div class="item">Riwayat Patroli</div>
+        </div>
+        <div class="dash-main">
+          <div class="dash-tile"><div class="k">Status Robot</div><div class="v" style="font-size:18px">Patroli · 62%</div></div>
+          <div class="dash-tile"><div class="k">Pohon Diperiksa</div><div class="v">1,204</div></div>
+          <div class="dash-tile wide">
+            <div class="k">Heatmap Risiko Ganoderma</div>
+            <div class="heat-grid" id="heat-grid"></div>
+          </div>
+          <div class="dash-tile"><div class="k">Brondolan Terdeteksi</div><div class="v">318</div></div>
+          <div class="dash-tile"><div class="k">Titik Disemprot</div><div class="v">87</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     13. ROADMAP
+     ============================================================ -->
+<section id="roadmap">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="eyebrow">Roadmap Pengembangan</div>
+      <h2>Sembilan tahap menuju unit yang siap diuji lapangan</h2>
+    </div>
+    <div class="roadmap reveal">
+      <div class="rm-step" data-n="1"><h4>Riset & studi literatur</h4><p>Memetakan penelitian terkait dan validasi kebutuhan lapangan.</p></div>
+      <div class="rm-step" data-n="2"><h4>Perancangan sistem</h4><p>Menyusun arsitektur mekanik, elektronik, dan software secara menyeluruh.</p></div>
+      <div class="rm-step" data-n="3"><h4>Pembuatan robot</h4><p>Fabrikasi chassis dan perakitan unit fisik.</p></div>
+      <div class="rm-step" data-n="4"><h4>Integrasi sensor</h4><p>Memasang dan mengkalibrasi seluruh sensor pada unit.</p></div>
+      <div class="rm-step" data-n="5"><h4>Pengembangan AI</h4><p>Melatih dan menguji model deteksi untuk tiap modul.</p></div>
+      <div class="rm-step" data-n="6"><h4>Backend & dashboard</h4><p>Membangun API, database, dan antarmuka pemantauan.</p></div>
+      <div class="rm-step" data-n="7"><h4>Integrasi penuh</h4><p>Menyatukan hardware, AI, dan dashboard jadi satu sistem.</p></div>
+      <div class="rm-step" data-n="8"><h4>Pengujian lapangan</h4><p>Uji coba langsung di kebun sawit sesungguhnya.</p></div>
+      <div class="rm-step" data-n="9"><h4>Evaluasi & penyempurnaan</h4><p>Perbaikan berdasarkan temuan pengujian lapangan.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     14. IMPACT & CLOSING
+     ============================================================ -->
+<section id="impact" class="section-dark">
+  <div class="wrap">
+    <div class="section-head center reveal" style="max-width:640px;margin-left:auto;margin-right:auto">
+      <div class="eyebrow" style="justify-content:center">Dampak yang Ditargetkan</div>
+      <h2>Kenapa ini penting untuk dikembangkan lebih lanjut</h2>
+    </div>
+    <div class="impact-grid">
+      <div class="reveal">
+        <div class="impact-num">↓</div>
+        <p class="impact-cap">Biaya inspeksi manual, karena satu robot mencakup banyak pohon tanpa sensor permanen di tiap titik.</p>
+      </div>
+      <div class="reveal reveal-delay-1">
+        <div class="impact-num">↑</div>
+        <p class="impact-cap">Kecepatan respons terhadap Ganoderma, karena terdeteksi sebelum gejala terlihat.</p>
+      </div>
+      <div class="reveal reveal-delay-2">
+        <div class="impact-num">↓</div>
+        <p class="impact-cap">Penggunaan herbisida, karena penyemprotan hanya tepat di titik gulma.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="closing section-dark" style="padding-top:var(--space-6)">
+  <div class="wrap">
+    <div class="reveal">
+      <div class="eyebrow" style="justify-content:center">Penutup</div>
+      <h2>PALMGUARD bukan sekadar alat baru — ini cara baru mengawasi kebun.</h2>
+      <p>Dari sensor yang menunggu, menjadi sistem yang berpatroli, mengamati, dan bertindak sendiri. Ini baru rancangan awal — dan kami ingin mengembangkannya lebih jauh sebagai penelitian PKM-KC.</p>
+    </div>
+  </div>
+</section>
+
+<footer class="section-dark">
+  <div class="wrap">PALMGUARD — Autonomous Smart Palm Assistant · Draft Konsep PKM-KC</div>
+</footer>
+
+<script>
+(function(){
+  /* ---------- Reveal on scroll ---------- */
+  const revealEls = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){ e.target.classList.add('in-view'); io.unobserve(e.target); }
+    });
+  }, { threshold:0.15, rootMargin:'0px 0px -60px 0px' });
+  revealEls.forEach(el=>io.observe(el));
+
+  /* ---------- Patrol spine progress ---------- */
+  const fill = document.getElementById('spine-fill');
+  const rover = document.getElementById('spine-rover');
+  function updateSpine(){
+    const h = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = h > 0 ? Math.min(100, (window.scrollY / h) * 100) : 0;
+    if(fill){ fill.style.height = pct + '%'; }
+    if(rover){ rover.style.top = pct + '%'; }
+  }
+  window.addEventListener('scroll', updateSpine, { passive:true });
+  window.addEventListener('resize', updateSpine);
+  updateSpine();
+
+  /* ---------- Hardware exploded-view sequential highlight ---------- */
+  const hwItems = document.querySelectorAll('.hw-item');
+  const hwIO = new IntersectionObserver((entries)=>{
+    entries.forEach((e,i)=>{
+      if(e.isIntersecting){
+        const idx = Array.from(hwItems).indexOf(e.target);
+        setTimeout(()=> e.target.classList.add('active'), idx * 90);
+        hwIO.unobserve(e.target);
+      }
+    });
+  }, { threshold:0.4 });
+  hwItems.forEach(el=>hwIO.observe(el));
+
+  /* ---------- Module tabs ---------- */
+  const tabs = document.querySelectorAll('.module-tab');
+  const panels = document.querySelectorAll('.module-panel');
+  tabs.forEach(tab=>{
+    tab.addEventListener('click', ()=>{
+      tabs.forEach(t=>t.classList.remove('active'));
+      panels.forEach(p=>p.classList.remove('active'));
+      tab.classList.add('active');
+      document.querySelector(`.module-panel[data-panel="${tab.dataset.tab}"]`).classList.add('active');
+    });
+  });
+
+  /* ---------- Dashboard heatmap (deterministic pseudo-random) ---------- */
+  const heat = document.getElementById('heat-grid');
+  if(heat){
+    let seed = 42;
+    function rnd(){ seed = (seed * 1103515245 + 12345) & 0x7fffffff; return (seed % 1000)/1000; }
+    const colors = ['#E6F2DD','#B1D3B9','#88BDA4','#659287'];
+    for(let i=0;i<48;i++){
+      const s = document.createElement('span');
+      const r = rnd();
+      const c = r < 0.5 ? colors[0] : r < 0.75 ? colors[1] : r < 0.92 ? colors[2] : colors[3];
+      s.style.background = c;
+      heat.appendChild(s);
+    }
+  }
+
+  /* ---------- Workflow loop diagram (built with JS to keep markup light) ---------- */
+  const loopSteps = [
+    'Charging Station','Berangkat Patroli','Navigasi (GPS+IMU+LiDAR)',
+    'Scan Pohon & Tanah','Analisis AI','Aksi (Alert/Simpan/Semprot)',
+    'Upload ke Cloud','Dashboard Petani','Kembali ke Charging'
+  ];
+  const svgNS = 'http://www.w3.org/2000/svg';
+  const g = document.getElementById('loop-nodes');
+  if(g){
+    const cx=350, cy=350, r=240;
+    loopSteps.forEach((label, i)=>{
+      const angle = (Math.PI*2 * i / loopSteps.length) - Math.PI/2;
+      const x = cx + r*Math.cos(angle);
+      const y = cy + r*Math.sin(angle);
+      const circle = document.createElementNS(svgNS,'circle');
+      circle.setAttribute('cx', x); circle.setAttribute('cy', y); circle.setAttribute('r', 7);
+      circle.setAttribute('fill', i===0 ? '#659287' : '#B1D3B9');
+      g.appendChild(circle);
+
+      const textAnchor = Math.cos(angle) > 0.3 ? 'start' : Math.cos(angle) < -0.3 ? 'end' : 'middle';
+      const tx = cx + (r+22)*Math.cos(angle);
+      const ty = cy + (r+22)*Math.sin(angle);
+      const text = document.createElementNS(svgNS,'text');
+      text.setAttribute('x', tx); text.setAttribute('y', ty);
+      text.setAttribute('text-anchor', textAnchor);
+      text.setAttribute('font-family',"'JetBrains Mono', monospace");
+      text.setAttribute('font-size','11');
+      text.setAttribute('fill','#3E4C44');
+      text.textContent = (i+1)+'. '+label;
+      g.appendChild(text);
+    });
+    // connecting arcs
+    for(let i=0;i<loopSteps.length;i++){
+      const a1 = (Math.PI*2 * i / loopSteps.length) - Math.PI/2;
+      const a2 = (Math.PI*2 * (i+1) / loopSteps.length) - Math.PI/2;
+      const x1 = cx + r*Math.cos(a1), y1 = cy + r*Math.sin(a1);
+      const x2 = cx + r*Math.cos(a2), y2 = cy + r*Math.sin(a2);
+      const path = document.createElementNS(svgNS,'path');
+      const largeArc = 0;
+      path.setAttribute('d', `M ${x1} ${y1} A ${r} ${r} 0 ${largeArc} 1 ${x2} ${y2}`);
+      path.setAttribute('stroke', '#88BDA4');
+      path.setAttribute('stroke-width','1.5');
+      path.setAttribute('fill','none');
+      path.setAttribute('opacity','0.5');
+      g.insertBefore(path, g.firstChild);
+    }
+  }
+})();
+</script>
+</body>
+</html>
