@@ -463,7 +463,21 @@ section{
   display:grid;
   grid-template-columns:220px 1fr;
 }
-@media (max-width:760px){ .dash-body{ grid-template-columns:1fr; } }
+@media (max-width:760px){
+  .dash-body{ grid-template-columns:1fr; }
+  .dash-nav{ flex-direction:row; flex-wrap:wrap; gap:4px; border-right:none; border-bottom:1px solid var(--line); padding:10px var(--space-2); }
+  .dash-nav .item{ font-size:11px; padding:6px 10px; }
+  .ringkasan-grid{ grid-template-columns:1fr !important; }
+  .heatmap-stats{ grid-template-columns:repeat(3,1fr); gap:6px; }
+  .heatmap-stat .num{ font-size:18px; }
+  .heatmap-detail-grid{ gap:2px; }
+  .bron-grid{ grid-template-columns:repeat(3,1fr); gap:4px; }
+  .bron-block{ padding:8px; }
+  .bron-block .bcount{ font-size:16px; }
+  .tl-item{ grid-template-columns:42px 1fr auto; gap:8px; }
+  .tl-time{ font-size:10px; }
+  .tl-info .tl-title{ font-size:12px; }
+}
 .dash-nav{
   padding:var(--space-3);
   border-right:1px solid var(--line);
@@ -472,9 +486,14 @@ section{
 }
 .dash-nav .item{
   font-size:13px; padding:9px 12px; border-radius:8px; color:var(--ink-soft);
+  cursor:pointer; transition:background .25s var(--ease), color .25s var(--ease);
 }
+.dash-nav .item:hover{ background:rgba(92,132,121,0.08); }
 .dash-nav .item.active{ background:var(--white); color:var(--primary); font-weight:600; box-shadow:0 1px 4px rgba(19,32,24,.08); }
-.dash-main{ padding:var(--space-3); display:grid; gap:var(--space-2); grid-template-columns:1fr 1fr; }
+.dash-main{ padding:var(--space-3); }
+.dash-panel{ display:none; animation:dashFadeIn .4s var(--ease); }
+.dash-panel.active{ display:block; }
+@keyframes dashFadeIn{ from{ opacity:0; transform:translateY(8px); } to{ opacity:1; transform:translateY(0); } }
 .dash-tile{
   border:1px solid var(--line); border-radius:var(--radius-s); padding:16px;
   grid-column:span 1;
@@ -484,6 +503,51 @@ section{
 .dash-tile .v{ font-family:var(--font-display); font-size:26px; font-weight:600; margin-top:4px; }
 .heat-grid{ display:grid; grid-template-columns:repeat(12,1fr); gap:3px; margin-top:10px; }
 .heat-grid span{ aspect-ratio:1; border-radius:2px; }
+
+/* Ringkasan panel */
+.ringkasan-grid{ display:grid; gap:var(--space-2); grid-template-columns:1fr 1fr; }
+.ringkasan-grid .dash-tile.wide{ grid-column:span 2; }
+
+/* Peta Robot panel */
+.peta-wrap{ position:relative; }
+.peta-svg{ width:100%; border-radius:var(--radius-s); background:var(--bg-soft); border:1px solid var(--line); }
+.peta-legend{ display:flex; gap:var(--space-2); margin-top:var(--space-2); font-family:var(--font-mono); font-size:11px; color:var(--ink-soft); flex-wrap:wrap; }
+.peta-legend span{ display:inline-flex; align-items:center; gap:5px; }
+.peta-legend .dot{ width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+.robot-pulse{ animation:robotBlink 2s ease-in-out infinite; }
+@keyframes robotBlink{ 0%,100%{ opacity:1; } 50%{ opacity:.4; } }
+
+/* Heatmap detail panel */
+.heatmap-detail{ display:grid; gap:var(--space-3); }
+.heatmap-detail-grid{ display:grid; grid-template-columns:repeat(12,1fr); gap:4px; }
+.heatmap-detail-grid span{ aspect-ratio:1; border-radius:3px; transition:transform .2s; }
+.heatmap-detail-grid span:hover{ transform:scale(1.3); z-index:1; }
+.heatmap-legend{ display:flex; gap:var(--space-2); align-items:center; font-family:var(--font-mono); font-size:11px; color:var(--ink-soft); }
+.heatmap-legend .swatch{ width:14px; height:14px; border-radius:3px; }
+.heatmap-stats{ display:grid; grid-template-columns:repeat(3,1fr); gap:var(--space-2); }
+.heatmap-stat{ text-align:center; padding:12px; border:1px solid var(--line); border-radius:var(--radius-s); }
+.heatmap-stat .num{ font-family:var(--font-display); font-size:22px; font-weight:700; color:var(--primary); }
+.heatmap-stat .lbl{ font-family:var(--font-mono); font-size:10px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.06em; margin-top:2px; }
+
+/* Brondolan panel */
+.bron-grid{ display:grid; grid-template-columns:repeat(6,1fr); gap:6px; }
+.bron-block{ background:var(--bg-soft); border:1px solid var(--line); border-radius:var(--radius-s); padding:12px; text-align:center; position:relative; }
+.bron-block .bname{ font-family:var(--font-mono); font-size:10px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.06em; margin-bottom:4px; }
+.bron-block .bcount{ font-family:var(--font-display); font-size:20px; font-weight:700; color:var(--primary); }
+.bron-block .bdots{ margin-top:6px; display:flex; flex-wrap:wrap; gap:3px; justify-content:center; }
+.bron-block .bdots span{ width:5px; height:5px; border-radius:50%; background:var(--secondary); }
+
+/* Riwayat panel */
+.timeline{ display:flex; flex-direction:column; gap:0; }
+.tl-item{ display:grid; grid-template-columns:52px 1fr auto; gap:12px; align-items:center; padding:14px 0; border-bottom:1px solid var(--line); }
+.tl-item:last-child{ border-bottom:none; }
+.tl-time{ font-family:var(--font-mono); font-size:11px; color:var(--ink-soft); }
+.tl-info .tl-title{ font-size:13.5px; font-weight:600; color:var(--ink); }
+.tl-info .tl-sub{ font-size:12px; color:var(--ink-soft); margin-top:1px; }
+.tl-badge{ font-family:var(--font-mono); font-size:11px; padding:4px 10px; border-radius:999px; white-space:nowrap; }
+.tl-badge.ok{ background:#E6F2DD; color:#3E7A5C; }
+.tl-badge.warn{ background:#FFF3D6; color:#8B6914; }
+.tl-badge.crit{ background:#FFE0D6; color:#8B3A2A; }
 
 /* ============================================================
    ROADMAP
@@ -918,22 +982,114 @@ footer{
         <span>palmguard.dashboard — kebun blok C</span>
       </div>
       <div class="dash-body">
-        <div class="dash-nav">
-          <div class="item active">Ringkasan</div>
-          <div class="item">Peta Robot</div>
-          <div class="item">Heatmap Ganoderma</div>
-          <div class="item">Heatmap Brondolan</div>
-          <div class="item">Riwayat Patroli</div>
+        <div class="dash-nav" role="tablist">
+          <div class="item active" data-dash="ringkasan" role="tab">Ringkasan</div>
+          <div class="item" data-dash="peta" role="tab">Peta Robot</div>
+          <div class="item" data-dash="ganoderma" role="tab">Heatmap Ganoderma</div>
+          <div class="item" data-dash="brondolan" role="tab">Heatmap Brondolan</div>
+          <div class="item" data-dash="riwayat" role="tab">Riwayat Patroli</div>
         </div>
         <div class="dash-main">
-          <div class="dash-tile"><div class="k">Status Robot</div><div class="v" style="font-size:18px">Patroli · 62%</div></div>
-          <div class="dash-tile"><div class="k">Pohon Diperiksa</div><div class="v">1,204</div></div>
-          <div class="dash-tile wide">
-            <div class="k">Heatmap Risiko Ganoderma</div>
-            <div class="heat-grid" id="heat-grid"></div>
+
+          <!-- Panel: Ringkasan -->
+          <div class="dash-panel active" data-dash-panel="ringkasan">
+            <div class="ringkasan-grid">
+              <div class="dash-tile"><div class="k">Status Robot</div><div class="v" style="font-size:18px">Patroli · 62%</div></div>
+              <div class="dash-tile"><div class="k">Pohon Diperiksa</div><div class="v">1,204</div></div>
+              <div class="dash-tile wide">
+                <div class="k">Heatmap Risiko Ganoderma</div>
+                <div class="heat-grid" id="heat-grid"></div>
+              </div>
+              <div class="dash-tile"><div class="k">Brondolan Terdeteksi</div><div class="v">318</div></div>
+              <div class="dash-tile"><div class="k">Titik Disemprot</div><div class="v">87</div></div>
+            </div>
           </div>
-          <div class="dash-tile"><div class="k">Brondolan Terdeteksi</div><div class="v">318</div></div>
-          <div class="dash-tile"><div class="k">Titik Disemprot</div><div class="v">87</div></div>
+
+          <!-- Panel: Peta Robot -->
+          <div class="dash-panel" data-dash-panel="peta">
+            <div class="peta-wrap">
+              <svg class="peta-svg" viewBox="0 0 480 280" id="peta-svg"></svg>
+              <div class="peta-legend">
+                <span><span class="dot" style="background:var(--primary)"></span>Robot</span>
+                <span><span class="dot" style="background:var(--secondary)"></span>Jalur Patroli</span>
+                <span><span class="dot" style="background:var(--accent)"></span>Blok Selesai</span>
+                <span><span class="dot" style="background:var(--line)"></span>Blok Remaining</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Panel: Heatmap Ganoderma -->
+          <div class="dash-panel" data-dash-panel="ganoderma">
+            <div class="heatmap-detail">
+              <div class="heatmap-stats">
+                <div class="heatmap-stat"><div class="num">1,041</div><div class="lbl">Sehat</div></div>
+                <div class="heatmap-stat"><div class="num" style="color:#8B6914">127</div><div class="lbl">Warning</div></div>
+                <div class="heatmap-stat"><div class="num" style="color:#8B3A2A">36</div><div class="lbl">Critical</div></div>
+              </div>
+              <div>
+                <div class="k" style="font-family:var(--font-mono);font-size:11px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Distribusi Risiko per Blok</div>
+                <div class="heatmap-detail-grid" id="heatmap-ganoderma"></div>
+              </div>
+              <div class="heatmap-legend">
+                <span><span class="swatch" style="background:#E6F2DD"></span>Sehat</span>
+                <span><span class="swatch" style="background:#B1D3B9"></span>Rendah</span>
+                <span><span class="swatch" style="background:#F5D76E"></span>Warning</span>
+                <span><span class="swatch" style="background:#E74C3C"></span>Critical</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Panel: Heatmap Brondolan -->
+          <div class="dash-panel" data-dash-panel="brondolan">
+            <div class="heatmap-detail">
+              <div class="heatmap-stats">
+                <div class="heatmap-stat"><div class="num">318</div><div class="lbl">Total Terdeteksi</div></div>
+                <div class="heatmap-stat"><div class="num" style="color:var(--primary)">6</div><div class="lbl">Blok Terdampak</div></div>
+                <div class="heatmap-stat"><div class="num" style="color:#8B6914">53</div><div class="lbl">Rata-rata/Blok</div></div>
+              </div>
+              <div>
+                <div class="k" style="font-family:var(--font-mono);font-size:11px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Distribusi Brondolan per Blok</div>
+                <div class="bron-grid" id="bron-grid"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Panel: Riwayat Patroli -->
+          <div class="dash-panel" data-dash-panel="riwayat">
+            <div class="timeline">
+              <div class="tl-item">
+                <div class="tl-time">14:32</div>
+                <div class="tl-info"><div class="tl-title">Blok C — Full Scan</div><div class="tl-sub">187 pohon · 12.4 km</div></div>
+                <div class="tl-badge ok">Selesai</div>
+              </div>
+              <div class="tl-item">
+                <div class="tl-time">11:15</div>
+                <div class="tl-info"><div class="tl-title">Blok A — Spot Spray</div><div class="tl-sub">23 titik gulma disemprot</div></div>
+                <div class="tl-badge warn">Warning</div>
+              </div>
+              <div class="tl-item">
+                <div class="tl-time">09:40</div>
+                <div class="tl-info"><div class="tl-title">Blok B — Full Scan</div><div class="tl-sub">204 pohon · 14.1 km</div></div>
+                <div class="tl-badge ok">Selesai</div>
+              </div>
+              <div class="tl-item">
+                <div class="tl-time">08:05</div>
+                <div class="tl-info"><div class="tl-title">Charging Selesai</div><div class="tl-sub>Baterai 100% · Siap patroli</div></div>
+                <div class="tl-badge ok">Ready</div>
+              </div>
+              <div class="tl-item">
+                <div class="tl-time">06:20</div>
+                <div class="tl-info"><div class="tl-title">Blok D — Ganoderma Alert</div><div class="tl-sub">3 pohon critical terdeteksi</div></div>
+                <div class="tl-badge crit">Critical</div>
+              </div>
+              <div class="tl-item">
+                <div class="tl-time">Yesterday</div>
+                <div class="tl-info"><div class="tl-title">Blok E — Full Scan</div><div class="tl-sub">156 pohon · 0 warning</div></div>
+                <div class="tl-badge ok">Selesai</div>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
     </div>
@@ -1114,6 +1270,123 @@ footer{
       path.setAttribute('opacity','0.5');
       g.insertBefore(path, g.firstChild);
     }
+  }
+
+  /* ---------- Dashboard tabs ---------- */
+  const dashItems = document.querySelectorAll('.dash-nav .item');
+  const dashPanels = document.querySelectorAll('.dash-panel');
+  dashItems.forEach(item=>{
+    item.addEventListener('click', ()=>{
+      dashItems.forEach(d=>d.classList.remove('active'));
+      dashPanels.forEach(p=>p.classList.remove('active'));
+      item.classList.add('active');
+      document.querySelector(`.dash-panel[data-dash-panel="${item.dataset.dash}"]`).classList.add('active');
+    });
+  });
+
+  /* ---------- Peta Robot SVG ---------- */
+  const petaSvg = document.getElementById('peta-svg');
+  if(petaSvg){
+    const svgNS='http://www.w3.org/2000/svg';
+    const bloks = [
+      {id:'A',x:30,y:20,w:130,h:110,done:true},
+      {id:'B',x:170,y:20,w:130,h:110,done:true},
+      {id:'C',x:310,y:20,w:140,h:110,done:false},
+      {id:'D',x:30,y:150,w:130,h:110,done:false},
+      {id:'E',x:170,y:150,w:130,h:110,done:false},
+      {id:'F',x:310,y:150,w:140,h:110,done:false}
+    ];
+    // bg
+    const bg = document.createElementNS(svgNS,'rect');
+    bg.setAttribute('width','480'); bg.setAttribute('height','280');
+    bg.setAttribute('rx','10'); bg.setAttribute('fill','#F3F8EF');
+    petaSvg.appendChild(bg);
+    // blocks
+    bloks.forEach(b=>{
+      const r = document.createElementNS(svgNS,'rect');
+      r.setAttribute('x',b.x); r.setAttribute('y',b.y);
+      r.setAttribute('width',b.w); r.setAttribute('height',b.h);
+      r.setAttribute('rx','6'); r.setAttribute('fill', b.done ? 'rgba(177,211,185,0.35)' : 'rgba(19,32,24,0.04)');
+      r.setAttribute('stroke', b.done ? '#88BDA4' : 'rgba(19,32,24,0.12)');
+      r.setAttribute('stroke-width','1');
+      petaSvg.appendChild(r);
+      const t = document.createElementNS(svgNS,'text');
+      t.setAttribute('x', b.x + b.w/2); t.setAttribute('y', b.y + b.h/2 + 4);
+      t.setAttribute('text-anchor','middle');
+      t.setAttribute('font-family',"'JetBrains Mono', monospace");
+      t.setAttribute('font-size','12'); t.setAttribute('font-weight','600');
+      t.setAttribute('fill', b.done ? '#5C8479' : 'rgba(19,32,24,0.25)');
+      t.textContent = 'Blok ' + b.id;
+      petaSvg.appendChild(t);
+    });
+    // patrol path (A → B → C, robot in C)
+    const pathD = 'M95 75 L235 75 L380 75 L380 130';
+    const pat = document.createElementNS(svgNS,'path');
+    pat.setAttribute('d', pathD);
+    pat.setAttribute('fill','none');
+    pat.setAttribute('stroke','#88BDA4');
+    pat.setAttribute('stroke-width','2');
+    pat.setAttribute('stroke-dasharray','6 4');
+    pat.setAttribute('opacity','0.7');
+    petaSvg.appendChild(pat);
+    // robot dot
+    const robotG = document.createElementNS(svgNS,'g');
+    robotG.classList.add('robot-pulse');
+    const robotBg = document.createElementNS(svgNS,'circle');
+    robotBg.setAttribute('cx','380'); robotBg.setAttribute('cy','130');
+    robotBg.setAttribute('r','10'); robotBg.setAttribute('fill','rgba(101,146,135,0.2)');
+    robotG.appendChild(robotBg);
+    const robotDot = document.createElementNS(svgNS,'circle');
+    robotDot.setAttribute('cx','380'); robotDot.setAttribute('cy','130');
+    robotDot.setAttribute('r','5'); robotDot.setAttribute('fill','#5C8479');
+    robotDot.setAttribute('stroke','#fff'); robotDot.setAttribute('stroke-width','2');
+    robotG.appendChild(robotDot);
+    petaSvg.appendChild(robotG);
+    // label
+    const rl = document.createElementNS(svgNS,'text');
+    rl.setAttribute('x','380'); rl.setAttribute('y','152');
+    rl.setAttribute('text-anchor','middle');
+    rl.setAttribute('font-family',"'JetBrains Mono', monospace");
+    rl.setAttribute('font-size','9'); rl.setAttribute('fill','#5C8479');
+    rl.textContent = '● Robot aktif';
+    petaSvg.appendChild(rl);
+  }
+
+  /* ---------- Heatmap Ganoderma detail ---------- */
+  const hmGan = document.getElementById('heatmap-ganoderma');
+  if(hmGan){
+    let seed = 77;
+    function rndG(){ seed = (seed * 1103515245 + 12345) & 0x7fffffff; return (seed % 1000)/1000; }
+    const cols = ['#E6F2DD','#B1D3B9','#F5D76E','#E74C3C'];
+    for(let i=0;i<96;i++){
+      const s = document.createElement('span');
+      const r = rndG();
+      const c = r < 0.6 ? cols[0] : r < 0.8 ? cols[1] : r < 0.94 ? cols[2] : cols[3];
+      s.style.background = c;
+      s.title = 'Pohon ' + (i+1);
+      hmGan.appendChild(s);
+    }
+  }
+
+  /* ---------- Brondolan grid ---------- */
+  const bronG = document.getElementById('bron-grid');
+  if(bronG){
+    const blokData = [
+      {name:'Blok A',count:89,dots:5},
+      {name:'Blok B',count:72,dots:4},
+      {name:'Blok C',count:54,dots:3},
+      {name:'Blok D',count:41,dots:3},
+      {name:'Blok E',count:38,dots:2},
+      {name:'Blok F',count:24,dots:2}
+    ];
+    blokData.forEach(b=>{
+      const d = document.createElement('div');
+      d.className = 'bron-block';
+      let dotsHtml = '';
+      for(let i=0;i<b.dots;i++) dotsHtml += '<span></span>';
+      d.innerHTML = '<div class="bname">'+b.name+'</div><div class="bcount">'+b.count+'</div><div class="bdots">'+dotsHtml+'</div>';
+      bronG.appendChild(d);
+    });
   }
 })();
 </script>
