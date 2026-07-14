@@ -443,321 +443,111 @@ section{
 @keyframes pulseFade{ 0%,100%{ opacity:1; } 50%{ opacity:.25; } }
 
 /* ============================================================
-   DASHBOARD — Professional SaaS-style
+   DASHBOARD MOCKUP
    ============================================================ */
 .dash-frame{
-  background:var(--dark);
+  background:var(--white);
+  border:1px solid var(--line);
   border-radius:var(--radius-l);
   overflow:hidden;
-  box-shadow:0 32px 80px -20px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.06);
+  box-shadow:0 40px 90px -40px rgba(19,32,24,0.35);
+}
+.dash-topbar{
+  display:flex; align-items:center; gap:8px;
+  padding:14px 18px; border-bottom:1px solid var(--line);
+  font-family:var(--font-mono); font-size:12px; color:var(--ink-soft);
+}
+.dash-topbar .lights{ display:flex; gap:6px; }
+.dash-topbar .lights span{ width:9px; height:9px; border-radius:50%; background:var(--accent); }
+.dash-body{
   display:grid;
   grid-template-columns:220px 1fr;
-  min-height:520px;
 }
-@media (max-width:860px){
-  .dash-frame{ grid-template-columns:1fr; min-height:auto; }
-  .dash-sidebar{ flex-direction:row; overflow-x:auto; border-right:none !important; border-bottom:1px solid var(--dark-line); padding:8px 12px !important; gap:2px !important; }
-  .dash-sidebar .nav-label{ display:none; }
-  .dash-sidebar .nav-item{ padding:8px 12px !important; font-size:10px !important; }
-  .dash-sidebar .nav-item svg{ width:16px; height:16px; }
-  .dash-sidebar .nav-item span:not(svg){ display:none; }
-  .dash-content{ padding:16px !important; }
-  .dash-stats{ grid-template-columns:repeat(2,1fr) !important; }
-  .dash-activity-list{ max-height:320px; }
-  .dash-map-grid{ grid-template-columns:repeat(2,1fr) !important; }
-  .dash-heatmap-grid{ grid-template-columns:repeat(8,1fr) !important; }
+@media (max-width:760px){
+  .dash-body{ grid-template-columns:1fr; }
+  .dash-nav{ flex-direction:row; flex-wrap:wrap; gap:4px; border-right:none; border-bottom:1px solid var(--line); padding:10px var(--space-2); }
+  .dash-nav .item{ font-size:11px; padding:6px 10px; }
+  .ringkasan-grid{ grid-template-columns:1fr !important; }
+  .heatmap-stats{ grid-template-columns:repeat(3,1fr); gap:6px; }
+  .heatmap-stat .num{ font-size:18px; }
+  .heatmap-detail-grid{ gap:2px; }
+  .bron-grid{ grid-template-columns:repeat(3,1fr); gap:4px; }
+  .bron-block{ padding:8px; }
+  .bron-block .bcount{ font-size:16px; }
+  .tl-item{ grid-template-columns:42px 1fr auto; gap:8px; align-items:center; }
+  .tl-time{ font-size:10px; }
+  .tl-info .tl-title{ font-size:12px; }
 }
-
-/* Sidebar */
-.dash-sidebar{
-  display:flex; flex-direction:column; gap:2px;
-  padding:20px 12px;
-  border-right:1px solid var(--dark-line);
-  background:rgba(0,0,0,0.15);
+.dash-nav{
+  padding:var(--space-3);
+  border-right:1px solid var(--line);
+  background:var(--bg-soft);
+  display:flex; flex-direction:column; gap:6px;
 }
-.dash-sidebar .nav-label{
-  font-family:var(--font-mono); font-size:10px; text-transform:uppercase;
-  letter-spacing:.1em; color:rgba(255,255,255,0.25); padding:0 10px; margin-bottom:6px;
+.dash-nav .item{
+  font-size:13px; padding:9px 12px; border-radius:8px; color:var(--ink-soft);
+  cursor:pointer; transition:background .25s var(--ease), color .25s var(--ease);
 }
-.dash-sidebar .nav-item{
-  display:flex; align-items:center; gap:10px;
-  padding:9px 10px; border-radius:8px; font-size:13px; font-weight:500;
-  color:rgba(255,255,255,0.45); cursor:pointer;
-  transition:all .2s var(--ease); white-space:nowrap;
-  position:relative;
-}
-.dash-sidebar .nav-item svg{ width:18px; height:18px; flex-shrink:0; opacity:0.5; transition:opacity .2s; }
-.dash-sidebar .nav-item:hover{ background:rgba(255,255,255,0.06); color:rgba(255,255,255,0.75); }
-.dash-sidebar .nav-item:hover svg{ opacity:0.8; }
-.dash-sidebar .nav-item.active{
-  background:rgba(101,146,135,0.15); color:var(--secondary);
-}
-.dash-sidebar .nav-item.active svg{ opacity:1; }
-.dash-sidebar .nav-item.active::before{
-  content:""; position:absolute; left:0; top:50%; transform:translateY(-50%);
-  width:3px; height:18px; border-radius:0 3px 3px 0;
-  background:var(--secondary);
-}
-.dash-sidebar-brand{
-  display:flex; align-items:center; gap:10px;
-  padding:0 10px 16px; border-bottom:1px solid var(--dark-line); margin-bottom:8px;
-}
-.dash-sidebar-brand .logo{ width:28px; height:28px; border-radius:8px; background:linear-gradient(135deg,var(--primary),var(--secondary)); display:flex; align-items:center; justify-content:center; }
-.dash-sidebar-brand .logo svg{ width:16px; height:16px; }
-.dash-sidebar-brand .brand-text{ font-family:var(--font-display); font-size:14px; font-weight:600; color:var(--white); }
-.dash-sidebar-brand .brand-sub{ font-size:10px; color:rgba(255,255,255,0.35); font-family:var(--font-mono); }
-
-/* Content area */
-.dash-content{
-  padding:24px 28px;
-  display:flex; flex-direction:column; gap:20px;
-  background:var(--dark);
-  overflow:hidden;
-}
-.dash-content-header{
-  display:flex; align-items:center; justify-content:space-between;
-  padding-bottom:16px; border-bottom:1px solid var(--dark-line);
-}
-.dash-content-header h3{
-  font-family:var(--font-display); font-size:18px; font-weight:600;
-  color:var(--white); margin:0;
-}
-.dash-content-header .header-meta{
-  display:flex; align-items:center; gap:12px;
-  font-family:var(--font-mono); font-size:11px; color:rgba(255,255,255,0.35);
-}
-.dash-content-header .live-dot{
-  width:7px; height:7px; border-radius:50%; background:#4ADE80;
-  animation:livePulse 2s ease-in-out infinite;
-}
-@keyframes livePulse{ 0%,100%{ opacity:1; box-shadow:0 0 0 0 rgba(74,222,128,0.4); } 50%{ opacity:.7; box-shadow:0 0 0 4px rgba(74,222,128,0); } }
-
-/* Stats row */
-.dash-stats{
-  display:grid; grid-template-columns:repeat(4,1fr); gap:12px;
-}
-.dash-stat-card{
-  background:rgba(255,255,255,0.03);
-  border:1px solid var(--dark-line);
-  border-radius:12px; padding:16px 18px;
-  transition:border-color .25s, background .25s;
-}
-.dash-stat-card:hover{ border-color:rgba(255,255,255,0.15); background:rgba(255,255,255,0.05); }
-.dash-stat-card .stat-label{
-  font-family:var(--font-mono); font-size:10px; text-transform:uppercase;
-  letter-spacing:.08em; color:rgba(255,255,255,0.35); margin-bottom:6px;
-}
-.dash-stat-card .stat-value{
-  font-family:var(--font-display); font-size:24px; font-weight:700; color:var(--white);
-}
-.dash-stat-card .stat-value.green{ color:#4ADE80; }
-.dash-stat-card .stat-value.yellow{ color:#FBBF24; }
-.dash-stat-card .stat-value.red{ color:#F87171; }
-.dash-stat-card .stat-sub{
-  font-size:11px; color:rgba(255,255,255,0.3); margin-top:4px;
-  font-family:var(--font-mono);
-}
-
-/* Panel area */
-.dash-panel-area{ flex:1; }
-.dash-panel{ display:none; animation:dashFadeIn .35s var(--ease); }
+.dash-nav .item:hover{ background:rgba(92,132,121,0.08); }
+.dash-nav .item.active{ background:var(--white); color:var(--primary); font-weight:600; box-shadow:0 1px 4px rgba(19,32,24,.08); }
+.dash-main{ padding:var(--space-3); }
+.dash-panel{ display:none; animation:dashFadeIn .4s var(--ease); }
 .dash-panel.active{ display:block; }
-@keyframes dashFadeIn{ from{ opacity:0; transform:translateY(6px); } to{ opacity:1; transform:translateY(0); } }
+@keyframes dashFadeIn{ from{ opacity:0; transform:translateY(8px); } to{ opacity:1; transform:translateY(0); } }
+.dash-tile{
+  border:1px solid var(--line); border-radius:var(--radius-s); padding:16px;
+  grid-column:span 1;
+}
+.dash-tile.wide{ grid-column:span 2; }
+.dash-tile .k{ font-family:var(--font-mono); font-size:11px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.06em; }
+.dash-tile .v{ font-family:var(--font-display); font-size:26px; font-weight:600; margin-top:4px; }
+.heat-grid{ display:grid; grid-template-columns:repeat(12,1fr); gap:3px; margin-top:10px; }
+.heat-grid span{ aspect-ratio:1; border-radius:2px; }
 
-/* ---- Ringkasan: activity + side panel ---- */
-.dash-overview{ display:grid; grid-template-columns:1fr 300px; gap:16px; }
-@media (max-width:860px){ .dash-overview{ grid-template-columns:1fr; } }
-.dash-activity-card{
-  background:rgba(255,255,255,0.03);
-  border:1px solid var(--dark-line);
-  border-radius:12px; overflow:hidden;
-}
-.dash-activity-header{
-  display:flex; align-items:center; justify-content:space-between;
-  padding:14px 18px; border-bottom:1px solid var(--dark-line);
-}
-.dash-activity-header h4{
-  font-family:var(--font-display); font-size:13px; font-weight:600;
-  color:var(--white); margin:0;
-}
-.dash-activity-header .badge-live{
-  display:flex; align-items:center; gap:5px;
-  font-family:var(--font-mono); font-size:10px; color:#4ADE80;
-}
-.dash-activity-header .badge-live::before{
-  content:""; width:5px; height:5px; border-radius:50%; background:#4ADE80;
-}
-.dash-activity-list{ max-height:340px; overflow-y:auto; }
-.dash-activity-list::-webkit-scrollbar{ width:4px; }
-.dash-activity-list::-webkit-scrollbar-thumb{ background:rgba(255,255,255,0.1); border-radius:4px; }
-.al-item{
-  display:grid; grid-template-columns:44px 1fr auto; gap:12px;
-  align-items:center; padding:12px 18px;
-  border-bottom:1px solid rgba(255,255,255,0.04);
-  transition:background .15s;
-}
-.al-item:last-child{ border-bottom:none; }
-.al-item:hover{ background:rgba(255,255,255,0.03); }
-.al-time{
-  font-family:var(--font-mono); font-size:11px; color:rgba(255,255,255,0.3);
-  font-variant-numeric:tabular-nums;
-}
-.al-info{ min-width:0; }
-.al-title{
-  font-size:13px; font-weight:600; color:var(--white);
-  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-}
-.al-sub{
-  font-size:11px; color:rgba(255,255,255,0.3); margin-top:1px;
-  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-}
-.al-badge{
-  font-family:var(--font-mono); font-size:10px; font-weight:500;
-  padding:3px 10px; border-radius:999px; white-space:nowrap;
-  justify-self:end;
-}
-.al-badge.ok{ background:rgba(74,222,128,0.12); color:#4ADE80; }
-.al-badge.warn{ background:rgba(251,191,36,0.12); color:#FBBF24; }
-.al-badge.crit{ background:rgba(248,113,113,0.12); color:#F87171; }
+/* Ringkasan panel */
+.ringkasan-grid{ display:grid; gap:var(--space-2); grid-template-columns:1fr 1fr; }
+.ringkasan-grid .dash-tile.wide{ grid-column:span 2; }
 
-/* Side status card */
-.dash-side-status{ display:flex; flex-direction:column; gap:12px; }
-.side-card{
-  background:rgba(255,255,255,0.03);
-  border:1px solid var(--dark-line);
-  border-radius:12px; padding:16px;
-}
-.side-card .sc-label{
-  font-family:var(--font-mono); font-size:10px; text-transform:uppercase;
-  letter-spacing:.08em; color:rgba(255,255,255,0.3); margin-bottom:8px;
-}
-.side-card .sc-value{
-  font-family:var(--font-display); font-size:20px; font-weight:700; color:var(--white);
-}
-.side-card .sc-bar{
-  height:4px; border-radius:2px; background:rgba(255,255,255,0.08); margin-top:10px; overflow:hidden;
-}
-.side-card .sc-bar-fill{ height:100%; border-radius:2px; transition:width .6s var(--ease); }
-.side-card .sc-detail{
-  font-size:11px; color:rgba(255,255,255,0.25); margin-top:6px; font-family:var(--font-mono);
-}
-.dash-mini-heatmap{ display:grid; grid-template-columns:repeat(6,1fr); gap:3px; margin-top:8px; }
-.dash-mini-heatmap span{ aspect-ratio:1; border-radius:2px; }
+/* Peta Robot panel */
+.peta-wrap{ position:relative; }
+.peta-svg{ width:100%; border-radius:var(--radius-s); background:var(--bg-soft); border:1px solid var(--line); }
+.peta-legend{ display:flex; gap:var(--space-2); margin-top:var(--space-2); font-family:var(--font-mono); font-size:11px; color:var(--ink-soft); flex-wrap:wrap; }
+.peta-legend span{ display:inline-flex; align-items:center; gap:5px; }
+.peta-legend .dot{ width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+.robot-pulse{ animation:robotBlink 2s ease-in-out infinite; }
+@keyframes robotBlink{ 0%,100%{ opacity:1; } 50%{ opacity:.4; } }
 
-/* ---- Peta panel ---- */
-.dash-map-card{
-  background:rgba(255,255,255,0.03);
-  border:1px solid var(--dark-line); border-radius:12px; overflow:hidden;
-}
-.dash-map-card .map-header{
-  display:flex; align-items:center; justify-content:space-between;
-  padding:14px 18px; border-bottom:1px solid var(--dark-line);
-}
-.dash-map-card .map-header h4{ font-family:var(--font-display); font-size:13px; font-weight:600; color:var(--white); margin:0; }
-.dash-map-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; padding:18px; }
-.map-block{
-  background:rgba(255,255,255,0.03); border:1px solid var(--dark-line);
-  border-radius:10px; padding:16px; text-align:center;
-  transition:border-color .25s, background .25s; position:relative;
-}
-.map-block:hover{ border-color:rgba(255,255,255,0.15); background:rgba(255,255,255,0.05); }
-.map-block.done{ border-color:rgba(74,222,128,0.3); background:rgba(74,222,128,0.05); }
-.map-block.active{ border-color:rgba(101,146,135,0.5); background:rgba(101,146,135,0.08); }
-.map-block .mb-name{ font-family:var(--font-mono); font-size:11px; font-weight:600; color:var(--white); }
-.map-block .mb-status{ font-size:10px; color:rgba(255,255,255,0.3); margin-top:2px; }
-.map-block .mb-dot{
-  width:8px; height:8px; border-radius:50%; margin:8px auto 0;
-}
-.map-block .mb-dot.green{ background:#4ADE80; }
-.map-block .mb-dot.yellow{ background:#FBBF24; animation:livePulse 2s infinite; }
-.map-block .mb-dot.gray{ background:rgba(255,255,255,0.15); }
-.map-legend{
-  display:flex; gap:16px; padding:0 18px 16px;
-  font-family:var(--font-mono); font-size:10px; color:rgba(255,255,255,0.3);
-}
-.map-legend span{ display:flex; align-items:center; gap:5px; }
-.map-legend .ldot{ width:6px; height:6px; border-radius:50%; }
+/* Heatmap detail panel */
+.heatmap-detail{ display:grid; gap:var(--space-3); }
+.heatmap-detail-grid{ display:grid; grid-template-columns:repeat(12,1fr); gap:4px; }
+.heatmap-detail-grid span{ aspect-ratio:1; border-radius:3px; transition:transform .2s; }
+.heatmap-detail-grid span:hover{ transform:scale(1.3); z-index:1; }
+.heatmap-legend{ display:flex; gap:var(--space-2); align-items:center; font-family:var(--font-mono); font-size:11px; color:var(--ink-soft); }
+.heatmap-legend .swatch{ width:14px; height:14px; border-radius:3px; }
+.heatmap-stats{ display:grid; grid-template-columns:repeat(3,1fr); gap:var(--space-2); }
+.heatmap-stat{ text-align:center; padding:12px; border:1px solid var(--line); border-radius:var(--radius-s); }
+.heatmap-stat .num{ font-family:var(--font-display); font-size:22px; font-weight:700; color:var(--primary); }
+.heatmap-stat .lbl{ font-family:var(--font-mono); font-size:10px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.06em; margin-top:2px; }
 
-/* ---- Heatmap panels ---- */
-.dash-heatmap-card{
-  background:rgba(255,255,255,0.03);
-  border:1px solid var(--dark-line); border-radius:12px; overflow:hidden;
-}
-.dash-heatmap-card .hm-header{
-  display:flex; align-items:center; justify-content:space-between;
-  padding:14px 18px; border-bottom:1px solid var(--dark-line);
-}
-.dash-heatmap-card .hm-header h4{ font-family:var(--font-display); font-size:13px; font-weight:600; color:var(--white); margin:0; }
-.dash-heatmap-card .hm-body{ padding:18px; display:flex; flex-direction:column; gap:14px; }
-.dash-heatmap-grid{ display:grid; grid-template-columns:repeat(12,1fr); gap:4px; }
-.dash-heatmap-grid span{
-  aspect-ratio:1; border-radius:3px;
-  transition:transform .15s, box-shadow .15s; cursor:default;
-}
-.dash-heatmap-grid span:hover{ transform:scale(1.35); box-shadow:0 0 8px rgba(0,0,0,0.3); z-index:1; }
-.hm-legend{ display:flex; gap:14px; font-family:var(--font-mono); font-size:10px; color:rgba(255,255,255,0.35); }
-.hm-legend span{ display:flex; align-items:center; gap:5px; }
-.hm-legend .sw{ width:12px; height:12px; border-radius:3px; }
+/* Brondolan panel */
+.bron-grid{ display:grid; grid-template-columns:repeat(6,1fr); gap:6px; }
+.bron-block{ background:var(--bg-soft); border:1px solid var(--line); border-radius:var(--radius-s); padding:12px; text-align:center; position:relative; }
+.bron-block .bname{ font-family:var(--font-mono); font-size:10px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.06em; margin-bottom:4px; }
+.bron-block .bcount{ font-family:var(--font-display); font-size:20px; font-weight:700; color:var(--primary); }
+.bron-block .bdots{ margin-top:6px; display:flex; flex-wrap:wrap; gap:3px; justify-content:center; }
+.bron-block .bdots span{ width:5px; height:5px; border-radius:50%; background:var(--secondary); }
 
-/* Brondolan blocks grid */
-.dash-bron-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
-.bron-card{
-  background:rgba(255,255,255,0.03); border:1px solid var(--dark-line);
-  border-radius:10px; padding:16px; text-align:center;
-  transition:border-color .25s, background .25s;
-}
-.bron-card:hover{ border-color:rgba(255,255,255,0.15); background:rgba(255,255,255,0.05); }
-.bron-card .bc-name{ font-family:var(--font-mono); font-size:10px; text-transform:uppercase; letter-spacing:.06em; color:rgba(255,255,255,0.3); margin-bottom:4px; }
-.bron-card .bc-count{ font-family:var(--font-display); font-size:22px; font-weight:700; color:var(--secondary); }
-.bron-card .bc-sub{ font-size:10px; color:rgba(255,255,255,0.2); margin-top:2px; }
-
-/* ---- Riwayat panel ---- */
-.dash-riwayat-card{
-  background:rgba(255,255,255,0.03);
-  border:1px solid var(--dark-line); border-radius:12px; overflow:hidden;
-}
-.dash-riwayat-card .rw-header{
-  display:flex; align-items:center; justify-content:space-between;
-  padding:14px 18px; border-bottom:1px solid var(--dark-line);
-}
-.dash-riwayat-card .rw-header h4{ font-family:var(--font-display); font-size:13px; font-weight:600; color:var(--white); margin:0; }
-.rw-list{ max-height:400px; overflow-y:auto; }
-.rw-list::-webkit-scrollbar{ width:4px; }
-.rw-list::-webkit-scrollbar-thumb{ background:rgba(255,255,255,0.1); border-radius:4px; }
-.rw-item{
-  display:grid; grid-template-columns:1fr auto; gap:16px;
-  align-items:center; padding:14px 18px;
-  border-bottom:1px solid rgba(255,255,255,0.04);
-  transition:background .15s;
-}
-.rw-item:last-child{ border-bottom:none; }
-.rw-item:hover{ background:rgba(255,255,255,0.03); }
-.rw-left{ display:flex; align-items:center; gap:14px; min-width:0; }
-.rw-icon{
-  width:36px; height:36px; border-radius:10px; flex-shrink:0;
-  display:flex; align-items:center; justify-content:center;
-}
-.rw-icon.ok{ background:rgba(74,222,128,0.1); }
-.rw-icon.warn{ background:rgba(251,191,36,0.1); }
-.rw-icon.crit{ background:rgba(248,113,113,0.1); }
-.rw-icon svg{ width:18px; height:18px; }
-.rw-text{ min-width:0; }
-.rw-title{
-  font-size:13px; font-weight:600; color:var(--white);
-  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-}
-.rw-sub{
-  font-size:11px; color:rgba(255,255,255,0.3); margin-top:1px;
-  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-  font-family:var(--font-mono);
-}
-.rw-badge{
-  font-family:var(--font-mono); font-size:10px; font-weight:500;
-  padding:4px 12px; border-radius:999px; white-space:nowrap; justify-self:end;
-}
-.rw-badge.ok{ background:rgba(74,222,128,0.12); color:#4ADE80; }
-.rw-badge.warn{ background:rgba(251,191,36,0.12); color:#FBBF24; }
-.rw-badge.crit{ background:rgba(248,113,113,0.12); color:#F87171; }
+/* Riwayat panel */
+.timeline{ display:flex; flex-direction:column; gap:0; }
+.tl-item{ display:grid; grid-template-columns:52px 1fr auto; gap:12px; align-items:center; padding:14px 0; border-bottom:1px solid var(--line); }
+.tl-item:last-child{ border-bottom:none; }
+.tl-time{ font-family:var(--font-mono); font-size:11px; color:var(--ink-soft); }
+.tl-info .tl-title{ font-size:13.5px; font-weight:600; color:var(--ink); }
+.tl-info .tl-sub{ font-size:12px; color:var(--ink-soft); margin-top:1px; }
+.tl-badge{ font-family:var(--font-mono); font-size:11px; padding:4px 10px; border-radius:999px; white-space:nowrap; justify-self:end; }
+.tl-badge.ok{ background:#E6F2DD; color:#3E7A5C; }
+.tl-badge.warn{ background:#FFF3D6; color:#8B6914; }
+.tl-badge.crit{ background:#FFE0D6; color:#8B3A2A; }
 
 /* ============================================================
    ROADMAP
@@ -1180,187 +970,122 @@ footer{
 <!-- ============================================================
      12. DASHBOARD
      ============================================================ -->
-<section id="dashboard" style="background:var(--dark); padding:var(--space-7) 0;">
+<section id="dashboard" style="background:var(--bg-soft)">
   <div class="wrap">
-    <div class="section-head reveal" style="margin-bottom:var(--space-4);">
-      <div class="eyebrow" style="color:var(--accent);">Dashboard Petani</div>
-      <h2 style="color:var(--white);">Semua yang robot lihat, dalam satu layar</h2>
+    <div class="section-head reveal">
+      <div class="eyebrow">Dashboard Petani</div>
+      <h2>Semua yang robot lihat, dalam satu layar</h2>
     </div>
     <div class="dash-frame reveal">
-
-      <!-- Sidebar -->
-      <div class="dash-sidebar">
-        <div class="dash-sidebar-brand">
-          <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg></div>
-          <div><div class="brand-text">PALMGUARD</div><div class="brand-sub">v1.0 — Kebun C</div></div>
-        </div>
-        <div class="nav-label">Navigation</div>
-        <div class="nav-item active" data-dash="ringkasan">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
-          <span>Ringkasan</span>
-        </div>
-        <div class="nav-item" data-dash="peta">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 6v16l7-4 8 4 7-4V2l-7 4-8-4-7 4z"/><path d="M8 2v16M16 6v16"/></svg>
-          <span>Peta Robot</span>
-        </div>
-        <div class="nav-item" data-dash="ganoderma">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-          <span>Heatmap Ganoderma</span>
-        </div>
-        <div class="nav-item" data-dash="brondolan">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="8" cy="10" r="1.5" fill="currentColor"/><circle cx="16" cy="10" r="1.5" fill="currentColor"/><circle cx="12" cy="15" r="1.5" fill="currentColor"/></svg>
-          <span>Heatmap Brondolan</span>
-        </div>
-        <div class="nav-item" data-dash="riwayat">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-          <span>Riwayat Patroli</span>
-        </div>
+      <div class="dash-topbar">
+        <div class="lights"><span></span><span></span><span></span></div>
+        <span>palmguard.dashboard — kebun blok C</span>
       </div>
-
-      <!-- Content -->
-      <div class="dash-content">
-        <div class="dash-content-header">
-          <h3 id="dash-title">Ringkasan</h3>
-          <div class="header-meta">
-            <span class="live-dot"></span>
-            <span id="dash-time">14 Juli 2026 · 14:32 WIB</span>
-          </div>
+      <div class="dash-body">
+        <div class="dash-nav" role="tablist">
+          <div class="item active" data-dash="ringkasan" role="tab">Ringkasan</div>
+          <div class="item" data-dash="peta" role="tab">Peta Robot</div>
+          <div class="item" data-dash="ganoderma" role="tab">Heatmap Ganoderma</div>
+          <div class="item" data-dash="brondolan" role="tab">Heatmap Brondolan</div>
+          <div class="item" data-dash="riwayat" role="tab">Riwayat Patroli</div>
         </div>
+        <div class="dash-main">
 
-        <!-- Stats Row -->
-        <div class="dash-stats">
-          <div class="dash-stat-card"><div class="stat-label">Status Robot</div><div class="stat-value green">Patroli</div><div class="stat-sub">Baterai 62%</div></div>
-          <div class="dash-stat-card"><div class="stat-label">Pohon Diperiksa</div><div class="stat-value">1,204</div><div class="stat-sub">dari 2,400 target</div></div>
-          <div class="dash-stat-card"><div class="stat-label">Brondolan</div><div class="stat-value yellow">318</div><div class="stat-sub">terdeteksi hari ini</div></div>
-          <div class="dash-stat-card"><div class="stat-label">Spot Spray</div><div class="stat-value">87</div><div class="stat-sub">titik disemprot</div></div>
-        </div>
-
-        <!-- Panels -->
-        <div class="dash-panel-area">
-
-          <!-- Ringkasan -->
+          <!-- Panel: Ringkasan -->
           <div class="dash-panel active" data-dash-panel="ringkasan">
-            <div class="dash-overview">
-              <div class="dash-activity-card">
-                <div class="dash-activity-header">
-                  <h4>Aktivitas Terbaru</h4>
-                  <div class="badge-live">Live</div>
-                </div>
-                <div class="dash-activity-list">
-                  <div class="al-item"><div class="al-time">14:32</div><div class="al-info"><div class="al-title">Blok C — Full Scan selesai</div><div class="al-sub">187 pohon · 12.4 km</div></div><div class="al-badge ok">Selesai</div></div>
-                  <div class="al-item"><div class="al-time">11:15</div><div class="al-info"><div class="al-title">Blok A — Spot Spray</div><div class="al-sub">23 titik gulma disemprot</div></div><div class="al-badge warn">Warning</div></div>
-                  <div class="al-item"><div class="al-time">09:40</div><div class="al-info"><div class="al-title">Blok B — Full Scan selesai</div><div class="al-sub">204 pohon · 14.1 km</div></div><div class="al-badge ok">Selesai</div></div>
-                  <div class="al-item"><div class="al-time">08:05</div><div class="al-info"><div class="al-title">Charging selesai</div><div class="al-sub">Baterai 100% · Siap patroli</div></div><div class="al-badge ok">Ready</div></div>
-                  <div class="al-item"><div class="al-time">06:20</div><div class="al-info"><div class="al-title">Blok D — Ganoderma alert</div><div class="al-sub">3 pohon critical terdeteksi</div></div><div class="al-badge crit">Critical</div></div>
-                  <div class="al-item"><div class="al-time">Yesterday</div><div class="al-info"><div class="al-title">Blok E — Full Scan selesai</div><div class="al-sub">156 pohon · 0 warning</div></div><div class="al-badge ok">Selesai</div></div>
-                </div>
+            <div class="ringkasan-grid">
+              <div class="dash-tile"><div class="k">Status Robot</div><div class="v" style="font-size:18px">Patroli · 62%</div></div>
+              <div class="dash-tile"><div class="k">Pohon Diperiksa</div><div class="v">1,204</div></div>
+              <div class="dash-tile wide">
+                <div class="k">Heatmap Risiko Ganoderma</div>
+                <div class="heat-grid" id="heat-grid"></div>
               </div>
-              <div class="dash-side-status">
-                <div class="side-card">
-                  <div class="sc-label">Baterai</div>
-                  <div class="sc-value">62%</div>
-                  <div class="sc-bar"><div class="sc-bar-fill" style="width:62%; background:linear-gradient(90deg,#4ADE80,#22C55E);"></div></div>
-                  <div class="sc-detail">Sisa ~2.4 jam</div>
-                </div>
-                <div class="side-card">
-                  <div class="sc-label">Ganoderma Risk</div>
-                  <div class="sc-value" style="color:#FBBF24;">127</div>
-                  <div class="sc-detail">pohon warning · 36 critical</div>
-                </div>
-                <div class="side-card">
-                  <div class="sc-label">Mini Heatmap</div>
-                  <div class="dash-mini-heatmap" id="heat-grid"></div>
-                </div>
-              </div>
+              <div class="dash-tile"><div class="k">Brondolan Terdeteksi</div><div class="v">318</div></div>
+              <div class="dash-tile"><div class="k">Titik Disemprot</div><div class="v">87</div></div>
             </div>
           </div>
 
-          <!-- Peta Robot -->
+          <!-- Panel: Peta Robot -->
           <div class="dash-panel" data-dash-panel="peta">
-            <div class="dash-map-card">
-              <div class="map-header"><h4>Peta Kebun — Blok A — F</h4></div>
-              <div class="dash-map-grid" id="dash-map-grid"></div>
-              <div class="map-legend">
-                <span><span class="ldot" style="background:#4ADE80"></span>Selesai</span>
-                <span><span class="ldot" style="background:var(--secondary)"></span>Sedang Dipatroli</span>
-                <span><span class="ldot" style="background:rgba(255,255,255,0.15)"></span>Belum</span>
+            <div class="peta-wrap">
+              <svg class="peta-svg" viewBox="0 0 480 280" id="peta-svg"></svg>
+              <div class="peta-legend">
+                <span><span class="dot" style="background:var(--primary)"></span>Robot</span>
+                <span><span class="dot" style="background:var(--secondary)"></span>Jalur Patroli</span>
+                <span><span class="dot" style="background:var(--accent)"></span>Blok Selesai</span>
+                <span><span class="dot" style="background:var(--line)"></span>Blok Remaining</span>
               </div>
             </div>
           </div>
 
-          <!-- Heatmap Ganoderma -->
+          <!-- Panel: Heatmap Ganoderma -->
           <div class="dash-panel" data-dash-panel="ganoderma">
-            <div class="dash-heatmap-card">
-              <div class="hm-header"><h4>Heatmap Risiko Ganoderma — Kebun Blok C</h4></div>
-              <div class="hm-body">
-                <div class="dash-heatmap-grid" id="heatmap-ganoderma"></div>
-                <div class="hm-legend">
-                  <span><span class="sw" style="background:#22C55E"></span>Sehat</span>
-                  <span><span class="sw" style="background:#86EFAC"></span>Rendah</span>
-                  <span><span class="sw" style="background:#FBBF24"></span>Warning</span>
-                  <span><span class="sw" style="background:#EF4444"></span>Critical</span>
-                </div>
+            <div class="heatmap-detail">
+              <div class="heatmap-stats">
+                <div class="heatmap-stat"><div class="num">1,041</div><div class="lbl">Sehat</div></div>
+                <div class="heatmap-stat"><div class="num" style="color:#8B6914">127</div><div class="lbl">Warning</div></div>
+                <div class="heatmap-stat"><div class="num" style="color:#8B3A2A">36</div><div class="lbl">Critical</div></div>
+              </div>
+              <div>
+                <div class="k" style="font-family:var(--font-mono);font-size:11px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Distribusi Risiko per Blok</div>
+                <div class="heatmap-detail-grid" id="heatmap-ganoderma"></div>
+              </div>
+              <div class="heatmap-legend">
+                <span><span class="swatch" style="background:#E6F2DD"></span>Sehat</span>
+                <span><span class="swatch" style="background:#B1D3B9"></span>Rendah</span>
+                <span><span class="swatch" style="background:#F5D76E"></span>Warning</span>
+                <span><span class="swatch" style="background:#E74C3C"></span>Critical</span>
               </div>
             </div>
           </div>
 
-          <!-- Heatmap Brondolan -->
+          <!-- Panel: Heatmap Brondolan -->
           <div class="dash-panel" data-dash-panel="brondolan">
-            <div class="dash-heatmap-card">
-              <div class="hm-header"><h4>Distribusi Brondolan per Blok</h4></div>
-              <div class="hm-body">
-                <div class="dash-bron-grid" id="bron-grid"></div>
+            <div class="heatmap-detail">
+              <div class="heatmap-stats">
+                <div class="heatmap-stat"><div class="num">318</div><div class="lbl">Total Terdeteksi</div></div>
+                <div class="heatmap-stat"><div class="num" style="color:var(--primary)">6</div><div class="lbl">Blok Terdampak</div></div>
+                <div class="heatmap-stat"><div class="num" style="color:#8B6914">53</div><div class="lbl">Rata-rata/Blok</div></div>
+              </div>
+              <div>
+                <div class="k" style="font-family:var(--font-mono);font-size:11px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Distribusi Brondolan per Blok</div>
+                <div class="bron-grid" id="bron-grid"></div>
               </div>
             </div>
           </div>
 
-          <!-- Riwayat Patroli -->
+          <!-- Panel: Riwayat Patroli -->
           <div class="dash-panel" data-dash-panel="riwayat">
-            <div class="dash-riwayat-card">
-              <div class="rw-header"><h4>Riwayat Patroli</h4></div>
-              <div class="rw-list">
-                <div class="rw-item">
-                  <div class="rw-left">
-                    <div class="rw-icon ok"><svg viewBox="0 0 24 24" fill="none" stroke="#4ADE80" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>
-                    <div class="rw-text"><div class="rw-title">Blok C — Full Scan</div><div class="rw-sub">187 pohon · 12.4 km · 14:32</div></div>
-                  </div>
-                  <div class="rw-badge ok">Selesai</div>
-                </div>
-                <div class="rw-item">
-                  <div class="rw-left">
-                    <div class="rw-icon warn"><svg viewBox="0 0 24 24" fill="none" stroke="#FBBF24" stroke-width="2" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
-                    <div class="rw-text"><div class="rw-title">Blok A — Spot Spray</div><div class="rw-sub">23 titik gulma disemprot · 11:15</div></div>
-                  </div>
-                  <div class="rw-badge warn">Warning</div>
-                </div>
-                <div class="rw-item">
-                  <div class="rw-left">
-                    <div class="rw-icon ok"><svg viewBox="0 0 24 24" fill="none" stroke="#4ADE80" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>
-                    <div class="rw-text"><div class="rw-title">Blok B — Full Scan</div><div class="rw-sub">204 pohon · 14.1 km · 09:40</div></div>
-                  </div>
-                  <div class="rw-badge ok">Selesai</div>
-                </div>
-                <div class="rw-item">
-                  <div class="rw-left">
-                    <div class="rw-icon ok"><svg viewBox="0 0 24 24" fill="none" stroke="#4ADE80" stroke-width="2" stroke-linecap="round"><rect x="6" y="7" width="12" height="10" rx="2"/><line x1="6" y1="17" x2="4" y2="21"/><line x1="18" y1="17" x2="20" y2="21"/></svg></div>
-                    <div class="rw-text"><div class="rw-title">Charging Selesai</div><div class="rw-sub">Baterai 100% · Siap patroli · 08:05</div></div>
-                  </div>
-                  <div class="rw-badge ok">Ready</div>
-                </div>
-                <div class="rw-item">
-                  <div class="rw-left">
-                    <div class="rw-icon crit"><svg viewBox="0 0 24 24" fill="none" stroke="#F87171" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
-                    <div class="rw-text"><div class="rw-title">Blok D — Ganoderma Alert</div><div class="rw-sub">3 pohon critical terdeteksi · 06:20</div></div>
-                  </div>
-                  <div class="rw-badge crit">Critical</div>
-                </div>
-                <div class="rw-item">
-                  <div class="rw-left">
-                    <div class="rw-icon ok"><svg viewBox="0 0 24 24" fill="none" stroke="#4ADE80" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>
-                    <div class="rw-text"><div class="rw-title">Blok E — Full Scan</div><div class="rw-sub">156 pohon · 0 warning · Yesterday</div></div>
-                  </div>
-                  <div class="rw-badge ok">Selesai</div>
-                </div>
+            <div class="timeline">
+              <div class="tl-item">
+                <div class="tl-time">14:32</div>
+                <div class="tl-info"><div class="tl-title">Blok C — Full Scan</div><div class="tl-sub">187 pohon · 12.4 km</div></div>
+                <div class="tl-badge ok">Selesai</div>
+              </div>
+              <div class="tl-item">
+                <div class="tl-time">11:15</div>
+                <div class="tl-info"><div class="tl-title">Blok A — Spot Spray</div><div class="tl-sub">23 titik gulma disemprot</div></div>
+                <div class="tl-badge warn">Warning</div>
+              </div>
+              <div class="tl-item">
+                <div class="tl-time">09:40</div>
+                <div class="tl-info"><div class="tl-title">Blok B — Full Scan</div><div class="tl-sub">204 pohon · 14.1 km</div></div>
+                <div class="tl-badge ok">Selesai</div>
+              </div>
+              <div class="tl-item">
+                <div class="tl-time">08:05</div>
+                <div class="tl-info"><div class="tl-title">Charging Selesai</div><div class="tl-sub>Baterai 100% · Siap patroli</div></div>
+                <div class="tl-badge ok">Ready</div>
+              </div>
+              <div class="tl-item">
+                <div class="tl-time">06:20</div>
+                <div class="tl-info"><div class="tl-title">Blok D — Ganoderma Alert</div><div class="tl-sub">3 pohon critical terdeteksi</div></div>
+                <div class="tl-badge crit">Critical</div>
+              </div>
+              <div class="tl-item">
+                <div class="tl-time">Yesterday</div>
+                <div class="tl-info"><div class="tl-title">Blok E — Full Scan</div><div class="tl-sub">156 pohon · 0 warning</div></div>
+                <div class="tl-badge ok">Selesai</div>
               </div>
             </div>
           </div>
@@ -1548,54 +1273,95 @@ footer{
   }
 
   /* ---------- Dashboard tabs ---------- */
-  const dashItems = document.querySelectorAll('.dash-sidebar .nav-item');
+  const dashItems = document.querySelectorAll('.dash-nav .item');
   const dashPanels = document.querySelectorAll('.dash-panel');
-  const dashTitle = document.getElementById('dash-title');
-  const titles = { ringkasan:'Ringkasan', peta:'Peta Robot', ganoderma:'Heatmap Ganoderma', brondolan:'Heatmap Brondolan', riwayat:'Riwayat Patroli' };
   dashItems.forEach(item=>{
     item.addEventListener('click', ()=>{
       dashItems.forEach(d=>d.classList.remove('active'));
       dashPanels.forEach(p=>p.classList.remove('active'));
       item.classList.add('active');
-      const key = item.dataset.dash;
-      document.querySelector(`.dash-panel[data-dash-panel="${key}"]`).classList.add('active');
-      if(dashTitle && titles[key]) dashTitle.textContent = titles[key];
+      document.querySelector(`.dash-panel[data-dash-panel="${item.dataset.dash}"]`).classList.add('active');
     });
   });
 
-  /* ---------- Peta Robot cards ---------- */
-  const mapGrid = document.getElementById('dash-map-grid');
-  if(mapGrid){
+  /* ---------- Peta Robot SVG ---------- */
+  const petaSvg = document.getElementById('peta-svg');
+  if(petaSvg){
+    const svgNS='http://www.w3.org/2000/svg';
     const bloks = [
-      {id:'A',status:'done',label:'Selesai'},
-      {id:'B',status:'done',label:'Selesai'},
-      {id:'C',status:'active',label:'Dipatroli'},
-      {id:'D',status:'',label:'Belum'},
-      {id:'E',status:'',label:'Belum'},
-      {id:'F',status:'',label:'Belum'}
+      {id:'A',x:30,y:20,w:130,h:110,done:true},
+      {id:'B',x:170,y:20,w:130,h:110,done:true},
+      {id:'C',x:310,y:20,w:140,h:110,done:false},
+      {id:'D',x:30,y:150,w:130,h:110,done:false},
+      {id:'E',x:170,y:150,w:130,h:110,done:false},
+      {id:'F',x:310,y:150,w:140,h:110,done:false}
     ];
+    // bg
+    const bg = document.createElementNS(svgNS,'rect');
+    bg.setAttribute('width','480'); bg.setAttribute('height','280');
+    bg.setAttribute('rx','10'); bg.setAttribute('fill','#F3F8EF');
+    petaSvg.appendChild(bg);
+    // blocks
     bloks.forEach(b=>{
-      const d = document.createElement('div');
-      d.className = 'map-block' + (b.status ? ' ' + b.status : '');
-      const dotClass = b.status === 'done' ? 'green' : b.status === 'active' ? 'yellow' : 'gray';
-      d.innerHTML = '<div class="mb-name">Blok '+b.id+'</div><div class="mb-status">'+b.label+'</div><div class="mb-dot '+dotClass+'"></div>';
-      mapGrid.appendChild(d);
+      const r = document.createElementNS(svgNS,'rect');
+      r.setAttribute('x',b.x); r.setAttribute('y',b.y);
+      r.setAttribute('width',b.w); r.setAttribute('height',b.h);
+      r.setAttribute('rx','6'); r.setAttribute('fill', b.done ? 'rgba(177,211,185,0.35)' : 'rgba(19,32,24,0.04)');
+      r.setAttribute('stroke', b.done ? '#88BDA4' : 'rgba(19,32,24,0.12)');
+      r.setAttribute('stroke-width','1');
+      petaSvg.appendChild(r);
+      const t = document.createElementNS(svgNS,'text');
+      t.setAttribute('x', b.x + b.w/2); t.setAttribute('y', b.y + b.h/2 + 4);
+      t.setAttribute('text-anchor','middle');
+      t.setAttribute('font-family',"'JetBrains Mono', monospace");
+      t.setAttribute('font-size','12'); t.setAttribute('font-weight','600');
+      t.setAttribute('fill', b.done ? '#5C8479' : 'rgba(19,32,24,0.25)');
+      t.textContent = 'Blok ' + b.id;
+      petaSvg.appendChild(t);
     });
-  }
-
-  /* ---------- Dashboard heatmap (mini, ringkasan sidebar) ---------- */
-  const heat = document.getElementById('heat-grid');
-  if(heat){
-    let seed = 42;
-    function rnd(){ seed = (seed * 1103515245 + 12345) & 0x7fffffff; return (seed % 1000)/1000; }
-    const colors = ['rgba(74,222,128,0.3)','rgba(74,222,128,0.5)','rgba(251,191,36,0.5)','rgba(248,113,113,0.5)'];
-    for(let i=0;i<36;i++){
-      const s = document.createElement('span');
-      const r = rnd();
-      const c = r < 0.5 ? colors[0] : r < 0.75 ? colors[1] : r < 0.92 ? colors[2] : colors[3];
-      s.style.background = c;
-      heat.appendChild(s);
-    }
+    // patrol path — follows road gaps between blocks, not through them
+    // Road between row 1 (bottom y=130) and row 2 (top y=150) = y=140
+    // Columns: A ends x=160, B starts x=170, B ends x=300, C starts x=310
+    const pathD = 'M95 135 L95 140 L380 140 L380 75';
+    const pat = document.createElementNS(svgNS,'path');
+    pat.setAttribute('d', pathD);
+    pat.setAttribute('fill','none');
+    pat.setAttribute('stroke','#88BDA4');
+    pat.setAttribute('stroke-width','2');
+    pat.setAttribute('stroke-dasharray','6 4');
+    pat.setAttribute('stroke-linecap','round');
+    pat.setAttribute('stroke-linejoin','round');
+    pat.setAttribute('opacity','0.7');
+    petaSvg.appendChild(pat);
+    // waypoint dots at each visited block
+    const waypoints = [{x:95,y:75},{x:235,y:75},{x:380,y:75}];
+    waypoints.forEach(wp=>{
+      const wd = document.createElementNS(svgNS,'circle');
+      wd.setAttribute('cx',wp.x); wd.setAttribute('cy',wp.y);
+      wd.setAttribute('r','3'); wd.setAttribute('fill','#88BDA4'); wd.setAttribute('opacity','0.6');
+      petaSvg.appendChild(wd);
+    });
+    // robot dot at block C
+    const robotG = document.createElementNS(svgNS,'g');
+    robotG.classList.add('robot-pulse');
+    const robotBg = document.createElementNS(svgNS,'circle');
+    robotBg.setAttribute('cx','380'); robotBg.setAttribute('cy','75');
+    robotBg.setAttribute('r','10'); robotBg.setAttribute('fill','rgba(101,146,135,0.2)');
+    robotG.appendChild(robotBg);
+    const robotDot = document.createElementNS(svgNS,'circle');
+    robotDot.setAttribute('cx','380'); robotDot.setAttribute('cy','75');
+    robotDot.setAttribute('r','5'); robotDot.setAttribute('fill','#5C8479');
+    robotDot.setAttribute('stroke','#fff'); robotDot.setAttribute('stroke-width','2');
+    robotG.appendChild(robotDot);
+    petaSvg.appendChild(robotG);
+    // label
+    const rl = document.createElementNS(svgNS,'text');
+    rl.setAttribute('x','380'); rl.setAttribute('y','58');
+    rl.setAttribute('text-anchor','middle');
+    rl.setAttribute('font-family',"'JetBrains Mono', monospace");
+    rl.setAttribute('font-size','9'); rl.setAttribute('fill','#5C8479');
+    rl.textContent = '● Robot aktif';
+    petaSvg.appendChild(rl);
   }
 
   /* ---------- Heatmap Ganoderma detail ---------- */
@@ -1603,7 +1369,7 @@ footer{
   if(hmGan){
     let seed = 77;
     function rndG(){ seed = (seed * 1103515245 + 12345) & 0x7fffffff; return (seed % 1000)/1000; }
-    const cols = ['rgba(34,197,94,0.5)','rgba(134,239,172,0.4)','rgba(251,191,36,0.6)','rgba(239,68,68,0.7)'];
+    const cols = ['#E6F2DD','#B1D3B9','#F5D76E','#E74C3C'];
     for(let i=0;i<96;i++){
       const s = document.createElement('span');
       const r = rndG();
@@ -1618,17 +1384,19 @@ footer{
   const bronG = document.getElementById('bron-grid');
   if(bronG){
     const blokData = [
-      {name:'Blok A',count:89,sub:'53 aktif'},
-      {name:'Blok B',count:72,sub:'41 aktif'},
-      {name:'Blok C',count:54,sub:'28 aktif'},
-      {name:'Blok D',count:41,sub:'19 aktif'},
-      {name:'Blok E',count:38,sub:'15 aktif'},
-      {name:'Blok F',count:24,sub:'9 aktif'}
+      {name:'Blok A',count:89,dots:5},
+      {name:'Blok B',count:72,dots:4},
+      {name:'Blok C',count:54,dots:3},
+      {name:'Blok D',count:41,dots:3},
+      {name:'Blok E',count:38,dots:2},
+      {name:'Blok F',count:24,dots:2}
     ];
     blokData.forEach(b=>{
       const d = document.createElement('div');
-      d.className = 'bron-card';
-      d.innerHTML = '<div class="bc-name">'+b.name+'</div><div class="bc-count">'+b.count+'</div><div class="bc-sub">'+b.sub+' brondolan</div>';
+      d.className = 'bron-block';
+      let dotsHtml = '';
+      for(let i=0;i<b.dots;i++) dotsHtml += '<span></span>';
+      d.innerHTML = '<div class="bname">'+b.name+'</div><div class="bcount">'+b.count+'</div><div class="bdots">'+dotsHtml+'</div>';
       bronG.appendChild(d);
     });
   }
