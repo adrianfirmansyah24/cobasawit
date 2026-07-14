@@ -300,9 +300,24 @@ section{
 .gap-row:not(.head) .col-b{ color:var(--ink-soft); }
 .gap-row:not(.head) .col-c{ color:var(--primary); font-weight:600; }
 @media (max-width:760px){
+  .gap-row.head{ display:none; }
   .gap-row{ grid-template-columns:1fr; }
-  .gap-row > div{ border-right:none; border-bottom:1px solid var(--line); }
+  .gap-row > div{ border-right:none; border-bottom:1px solid var(--line); padding:16px 18px; }
   .gap-row > div:last-child{ border-bottom:none; }
+  .gap-row > div::before{
+    content:attr(data-label);
+    display:block;
+    font-family:var(--font-mono);
+    font-size:10.5px;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    color:var(--primary);
+    margin-bottom:6px;
+  }
+  .gap-row .col-a,
+  .gap-row .col-b,
+  .gap-row .col-c{ color:var(--ink-soft); font-weight:400; }
+  .gap-row .col-c{ color:var(--ink); font-weight:500; }
 }
 .gap-statement{
   margin-top:var(--space-4);
@@ -642,13 +657,13 @@ footer{
         <div>Kebutuhan</div><div>Pendekatan Existing</div><div>Yang Belum Terjawab</div>
       </div>
       <div class="gap-row">
-        <div class="col-a">Cakupan tiap pohon, bukan sampel</div><div class="col-b">Sensor tetap (mahal bila menyeluruh) / manual (tidak konsisten)</div><div class="col-c">Cakupan penuh dengan biaya rendah</div>
+        <div class="col-a" data-label="Kebutuhan">Cakupan tiap pohon, bukan sampel</div><div class="col-b" data-label="Existing">Sensor tetap (mahal bila menyeluruh) / manual (tidak konsisten)</div><div class="col-c" data-label="Belum Terjawab">Cakupan penuh dengan biaya rendah</div>
       </div>
       <div class="gap-row">
-        <div class="col-a">Data dari dekat batang & tanah</div><div class="col-b">Drone hanya melihat dari atas</div><div class="col-c">Inspeksi jarak dekat yang mobile</div>
+        <div class="col-a" data-label="Kebutuhan">Data dari dekat batang & tanah</div><div class="col-b" data-label="Existing">Drone hanya melihat dari atas</div><div class="col-c" data-label="Belum Terjawab">Inspeksi jarak dekat yang mobile</div>
       </div>
       <div class="gap-row">
-        <div class="col-a">Tindakan langsung di lokasi</div><div class="col-b">Ketiganya hanya mendeteksi, tidak bertindak</div><div class="col-c">Deteksi sekaligus aksi (spot spraying)</div>
+        <div class="col-a" data-label="Kebutuhan">Tindakan langsung di lokasi</div><div class="col-b" data-label="Existing">Ketiganya hanya mendeteksi, tidak bertindak</div><div class="col-c" data-label="Belum Terjawab">Deteksi sekaligus aksi (spot spraying)</div>
       </div>
     </div>
     <div class="gap-statement reveal">
